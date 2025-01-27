@@ -9,15 +9,22 @@ interface Player {
 }
 
 interface Game {
-    end_time: number
+    end_time: number;
     white: Player;
     black: Player;
+}
+
+interface UserData {
+    avatar?: string;
+    status?: string;
+    league?: string;
+    country?: string;
 }
 
 export default function UserPage() {
     const router = useRouter()
     const { username } = useParams()
-    const [userData, setUserData] = useState(null)
+    const [userData, setUserData] = useState<UserData | null>(null)
     const [countryCode, setCountryCode] = useState(null)
     const [games, setGames] = useState<Game[]>([])
     const [error, setError] = useState<string | null>(null)
@@ -113,13 +120,15 @@ export default function UserPage() {
     return (
         <div className="p-8 flex flex-col items-center">
             <div className="flex items-center gap-4 mb-4">
-                <img
-                    src={userData.avatar}
-                    alt={`${username}'s avatar`}
-                    className="rounded-full"
-                    width={100}
-                    height={100}
-                />
+            {userData?.avatar && (
+                    <img
+                        src={userData.avatar}
+                        alt={`${username}'s avatar`}
+                        className="rounded-full"
+                        width={100}
+                        height={100}
+                    />
+                )}
                 <h1 className="text-2xl font-bold text-primary">{username}</h1>
                 {countryCode && (
                     <img
@@ -130,8 +139,12 @@ export default function UserPage() {
                 )}
             </div>
             <div className="text-center text-foreground mt-6">
-                <p>{userData.status.charAt(0).toUpperCase() + userData.status.slice(1)} player</p>
-                <p>Player league : {userData.league}</p>
+            {userData?.status && (
+                    <p>{userData.status.charAt(0).toUpperCase() + userData.status.slice(1)} player</p>
+                )}
+                {userData?.league && (
+                    <p>Player league : {userData.league}</p>
+                )}
             </div>
             <div className="mt-5 w-full max-w-4xl text-foreground">
                 <h2 className="text-xl font-bold mb-4">Last games:</h2>
