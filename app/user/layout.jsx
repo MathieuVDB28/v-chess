@@ -4,17 +4,15 @@ import Footer from '@/app/components/Footer'
 
 export default function UserLayout({ children }) {
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col min-h-screen">
       <div className="ml-64">
         <Navbar />
       </div>
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 ml-64">
-          {children}
-        </main>
-      </div>
-      <div className="ml-64">
+      <Sidebar />
+      <main className="flex-grow ml-64">
+        {children}
+      </main>
+      <div className="ml-64 mt-6">
         <Footer />
       </div>
     </div>
