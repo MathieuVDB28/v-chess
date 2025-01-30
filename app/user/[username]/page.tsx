@@ -6,6 +6,7 @@ interface Player {
     username: string;
     result: string;
     country?: string;
+    rating?: number;
 }
 
 interface Game {
@@ -119,27 +120,8 @@ export default function UserPage() {
 
     return (
         <div className="p-8 flex flex-col items-center">
-            <div className="flex items-center gap-4 mb-4">
-            {userData?.avatar && (
-                    <img
-                        src={userData.avatar}
-                        alt={`${username}'s avatar`}
-                        className="rounded-full"
-                        width={100}
-                        height={100}
-                    />
-                )}
-                <h1 className="text-2xl font-bold text-primary">{username}</h1>
-                {countryCode && (
-                    <img
-                        src={`https://flagsapi.com/${countryCode}/flat/64.png`}
-                        alt={`${countryCode} flag`}
-                        className="w-8 h-8"
-                    />
-                )}
-            </div>
-            <div className="text-center text-foreground mt-6">
-            {userData?.status && (
+            <div className="text-center text-foreground">
+                {userData?.status && (
                     <p>{userData.status.charAt(0).toUpperCase() + userData.status.slice(1)} player</p>
                 )}
                 {userData?.league && (
@@ -158,10 +140,17 @@ export default function UserPage() {
                                 <div className="flex justify-between items-center">
                                     <div className="flex-1">
                                         <p className="text-sm flex items-center gap-2">
-                                            White: 
-                                            <span className={game.white.username === username ? 'text-primary' : 'text-foreground'}>
-                                                {game.white.username}
-                                            </span>
+                                            White:
+                                            {game.white.username === username ? (
+                                                <span className="text-primary">{game.white.username}</span>
+                                            ) : (
+                                                <span
+                                                    className="text-foreground hover:text-chart4 cursor-pointer"
+                                                    onClick={() => router.push(`/user/${game.white.username}`)}
+                                                >
+                                                    {game.white.username}
+                                                </span>
+                                            )}
                                             {playerFlags[game.white.username] && (
                                                 <img
                                                     src={`https://flagsapi.com/${playerFlags[game.white.username]}/flat/24.png`}
@@ -169,12 +158,22 @@ export default function UserPage() {
                                                     className="w-4 h-4"
                                                 />
                                             )}
+                                            {game.white.rating && (
+                                                <span className="text-sm">{game.white.rating}</span>
+                                            )}
                                         </p>
                                         <p className="text-sm flex items-center gap-2">
-                                            Black: 
-                                            <span className={game.black.username === username ? 'text-primary' : 'text-foreground'}>
-                                                {game.black.username}
-                                            </span>
+                                            Black:
+                                            {game.black.username === username ? (
+                                                <span className="text-primary">{game.black.username}</span>
+                                            ) : (
+                                                <span
+                                                    className="text-foreground hover:text-chart4 cursor-pointer"
+                                                    onClick={() => router.push(`/user/${game.black.username}`)}
+                                                >
+                                                    {game.black.username}
+                                                </span>
+                                            )}
                                             {playerFlags[game.black.username] && (
                                                 <img
                                                     src={`https://flagsapi.com/${playerFlags[game.black.username]}/flat/24.png`}
@@ -182,24 +181,31 @@ export default function UserPage() {
                                                     className="w-4 h-4"
                                                 />
                                             )}
+                                            {game.black.rating && (
+                                                <span className="text-sm">{game.black.rating}</span>
+                                            )}
                                         </p>
                                     </div>
                                     <div className="text-sm flex-1 flex">
-                                        <div className="font-medium flex items-center gap-2 w-full">
+                                        <div className="font-medium flex justify-end items-center gap-2 w-full">
                                             {game.white.username === username
                                                 ? (
                                                     <>
-                                                        <span className={`${game.white.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
-                                                            {game.white.result === 'win' ? '+' : '-'}
-                                                        </span>
-                                                        <span className="text-foreground ml-auto">({game.white.result === 'win' ? game.black.result : game.white.result})</span>
+                                                        <div>
+                                                            <span className={`${game.white.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
+                                                                {game.white.result === 'win' ? '+' : '-'}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-foreground">({game.white.result === 'win' ? game.black.result : game.white.result})</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <span className={`${game.black.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
-                                                            {game.black.result === 'win' ? '+' : '-'}
-                                                        </span>
-                                                        <span className="text-foreground ml-auto">({game.black.result === 'win' ? game.white.result : game.black.result})</span>
+                                                        <div>
+                                                            <span className={`${game.black.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
+                                                                {game.black.result === 'win' ? '+' : '-'}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-foreground">({game.black.result === 'win' ? game.white.result : game.black.result})</span>
                                                     </>
                                                 )
                                             }

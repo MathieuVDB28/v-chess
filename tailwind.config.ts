@@ -14,6 +14,8 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: "hsl(var(--primary))",
         sidebar: "hsl(var(--card))",
+        input: "hsl(var(--input))",
+        chart4: "hsl(var(--chart-4))",
       },
     },
   },
