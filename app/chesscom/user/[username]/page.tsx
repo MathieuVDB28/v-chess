@@ -1,10 +1,8 @@
 'use client'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Rocket, Thunderstorm, Clock } from 'iconoir-react'
+import dayjs from 'dayjs'
 
 interface Player {
     username: string;
@@ -17,31 +15,44 @@ interface Game {
     end_time: number;
     white: Player;
     black: Player;
+    time_class: string;
 }
 
-export default function AllGamesPage() {
-    const { username } = useParams()
+interface UserData {
+    avatar?: string;
+    status?: string;
+    league?: string;
+    country?: string;
+}
+
+export default function UserPage() {
     const router = useRouter()
+    const { username } = useParams()
+    const [userData, setUserData] = useState<UserData | null>(null)
+    const [countryCode, setCountryCode] = useState(null)
     const [games, setGames] = useState<Game[]>([])
     const [error, setError] = useState<string | null>(null)
     const [playerFlags, setPlayerFlags] = useState<Record<string, string>>({})
-
-    const aMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const date = new Date();
-    let currentMonth = aMonth[date.getMonth()];
+    const [selectedDate] = useState<dayjs.Dayjs | null>(null)
 
     useEffect(() => {
-        const fetchGames = async () => {
+        const fetchData = async () => {
             try {
-                const currentDate = new Date()
-                const year = currentDate.getFullYear()
-                const month = String(currentDate.getMonth() + 1).padStart(2, '0')
-                const response = await fetch(`https://api.chess.com/pub/player/${username}/games/${year}/${month}`)
-                if (!response.ok) {
-                    throw new Error('Failed to fetch games')
+                const userResponse = await fetch(`https://api.chess.com/pub/player/${username}`)
+                if (!userResponse.ok) {
+                    throw new Error('Failed to fetch user data')
                 }
-                const data = await response.json()
-                setGames(data.games)
+                const userData = await userResponse.json()
+                setUserData(userData)
+
+                if (userData.country) {
+                    const countryResponse = await fetch(userData.country)
+                    if (!countryResponse.ok) {
+                        throw new Error('Failed to fetch country data')
+                    }
+                    const countryData = await countryResponse.json()
+                    setCountryCode(countryData.code)
+                }
             } catch (err) {
                 if (err instanceof Error) {
                     setError(err.message)
@@ -52,7 +63,7 @@ export default function AllGamesPage() {
         }
 
         if (username) {
-            fetchGames()
+            fetchData()
         }
     }, [username])
 
@@ -92,60 +103,91 @@ export default function AllGamesPage() {
         return new Date(timestamp * 1000).toLocaleDateString()
     }
 
-    const labelColor = "#ffffff";
-    const theme = createTheme({
-        components: {
-            MuiIconButton: {
-                styleOverrides: {
-                    sizeMedium: {
-                        color: labelColor
-                    }
-                }
-            },
-            MuiOutlinedInput: {
-                styleOverrides: {
-                    root: {
-                        color: labelColor,
-                        border: '1px solid #ffffff'
-                    }
-                }
-            },
-            MuiInputLabel: {
-                styleOverrides: {
-                    root: {
-                        color: labelColor
-                    }
+    const fetchGames = async (year: string, month: string) => {
+        try {
+            const response = await fetch(`https://api.chess.com/pub/player/${username}/games/${year}/${month}`)
+            if (!response.ok) {
+                throw new Error('Failed to fetch games')
+            }
+            const data = await response.json()
+            return data.games
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('An unknown error occurred')
+            }
+            return []
+        }
+    }
+
+    useEffect(() => {
+        const loadGames = async () => {
+            if (!username) return
+
+            let currentDate = selectedDate ? dayjs(selectedDate) : dayjs()
+            let gamesFound = false
+            let attempts = 0
+            const maxAttempts = 3
+
+            while (!gamesFound && attempts < maxAttempts) {
+                const year = currentDate.format('YYYY')
+                const month = currentDate.format('MM')
+                const gamesForMonth = await fetchGames(year, month)
+
+                if (gamesForMonth && gamesForMonth.length > 0) {
+                    setGames(gamesForMonth)
+                    gamesFound = true
+                } else {
+                    currentDate = currentDate.subtract(1, 'month')
+                    attempts++
                 }
             }
-        }
-    });
 
-    if (error) return <div>Error: {error}</div>
-    if (!games.length) return <div>Loading...</div>
+            if (!gamesFound) {
+                setError('No games found in the last 3 months')
+                setGames([])
+            }
+        }
+
+        loadGames()
+    }, [username, selectedDate])
+
+    if (error) {
+        return <div>Error: {error}</div>
+    }
+
+    if (!userData) {
+        return <div>Loading...</div>
+    }
 
     return (
-        <div className="p-8">
-            <div className="max-w-4xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-foreground">
-                        {currentMonth} games played :
-                    </h1>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <ThemeProvider theme={theme}>
-                            <DatePicker className="input_date disabled" label="Filter with a start date" />
-                        </ThemeProvider>
-                    </LocalizationProvider>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+        <div className="p-8 flex flex-col items-center">
+            <div className="text-center text-foreground">
+                {userData?.status && (
+                    <p>{userData.status.charAt(0).toUpperCase() + userData.status.slice(1)} player</p>
+                )}
+                {userData?.league && (
+                    <p>Player league : {userData.league}</p>
+                )}
+            </div>
+            <div className="mt-5 w-full max-w-4xl text-foreground">
+                <h2 className="text-xl font-bold mb-4">Last games:</h2>
+                <div className="grid grid-cols-2 gap-4 mt-8">
                     {games
                         .sort((a, b) => b.end_time - a.end_time)
+                        .slice(0, 6)
                         .map((game, index) => (
-                            <div key={index} className="p-4 border rounded-lg">
-                                <p className="font-semibold text-foreground">{formatDate(game.end_time)}</p>
+                            <div key={index} className="p-4 border rounded-lg relative">
+                                <div className="absolute top-4 left-4 text-foreground/80">
+                                    {game.time_class === 'bullet' && <Rocket className="w-5 h-5" />}
+                                    {game.time_class === 'blitz' && <Thunderstorm className="w-5 h-5" />}
+                                    {game.time_class === 'rapid' && <Clock className="w-5 h-5" />}
+                                </div>
+                                <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
                                 <div className="flex justify-between items-center">
                                     <div className="flex-1">
-                                        <p className="text-sm flex items-center gap-2 text-foreground">
+                                        <p className="text-sm flex items-center gap-2">
                                             White:
                                             {game.white.username === username ? (
                                                 <span className="text-primary">{game.white.username}</span>
@@ -168,7 +210,7 @@ export default function AllGamesPage() {
                                                 <span className="text-sm">{game.white.rating}</span>
                                             )}
                                         </p>
-                                        <p className="text-sm flex items-center gap-2 text-foreground">
+                                        <p className="text-sm flex items-center gap-2">
                                             Black:
                                             {game.black.username === username ? (
                                                 <span className="text-primary">{game.black.username}</span>
@@ -221,6 +263,16 @@ export default function AllGamesPage() {
                             </div>
                         ))}
                 </div>
+                {games.length > 5 && (
+                    <div className="mt-10 text-center">
+                        <button
+                            onClick={() => router.push(`/chesscom/user/${username}/games`)}
+                            className="px-4 py-2 bg-primary text-background rounded hover:bg-background hover:border-primary hover:text-primary transition-colors"
+                        >
+                            See all the user games
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     )

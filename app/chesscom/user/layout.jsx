@@ -1,5 +1,5 @@
 import Sidebar from '@/app/components/Sidebar'
-import Navbar from '@/app/user/components/Navbar'
+import Navbar from '@/app/components/NavbarUser'
 import Footer from '@/app/components/Footer'
 
 export default function UserLayout({ children }) {
