@@ -124,7 +124,7 @@ export default function AllGamesPage() {
             <div className="max-w-4xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold text-foreground">
-                        {currentMonth} {selectedYear} games played:
+                        {currentMonth} {selectedYear} games played :
                     </h1>
                     <div className="flex gap-4">
                         <select
@@ -163,9 +163,9 @@ export default function AllGamesPage() {
                             .map((game, index) => (
                                 <div key={index} className="p-4 border rounded-lg relative">
                                     <div className="absolute top-4 left-4 text-foreground/80">
-                                        {game.time_class === 'bullet' && <Rocket className="w-5 h-5" />}
-                                        {game.time_class === 'blitz' && <Thunderstorm className="w-5 h-5" />}
-                                        {game.time_class === 'rapid' && <Clock className="w-5 h-5" />}
+                                        {game.time_class === 'bullet' && <span className="text-sm">🚀</span>}
+                                        {game.time_class === 'blitz' && <span className="text-sm">⚡️</span>}
+                                        {game.time_class === 'rapid' && <span className="text-sm">🕛</span>}
                                     </div>
                                     <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
                                     <div className="flex justify-between items-center">

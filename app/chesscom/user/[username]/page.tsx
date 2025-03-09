@@ -1,7 +1,6 @@
 'use client'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Rocket, Thunderstorm, Clock } from 'iconoir-react'
 import dayjs from 'dayjs'
 
 interface Player {
@@ -25,6 +24,39 @@ interface UserData {
     country?: string;
 }
 
+interface PlayerStats {
+    chess_rapid: {
+        last: {
+            rating: number;
+            date: number;
+        };
+        best: {
+            rating: number;
+            date: number;
+        };
+        record: {
+            win: number;
+            loss: number;
+            draw: number;
+        };
+    };
+    chess_blitz: {
+        last: {
+            rating: number;
+            date: number;
+        };
+        best: {
+            rating: number;
+            date: number;
+        };
+        record: {
+            win: number;
+            loss: number;
+            draw: number;
+        };
+    };
+}
+
 export default function UserPage() {
     const router = useRouter()
     const { username } = useParams()
@@ -34,6 +66,7 @@ export default function UserPage() {
     const [error, setError] = useState<string | null>(null)
     const [playerFlags, setPlayerFlags] = useState<Record<string, string>>({})
     const [selectedDate] = useState<dayjs.Dayjs | null>(null)
+    const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -64,6 +97,28 @@ export default function UserPage() {
 
         if (username) {
             fetchData()
+        }
+    }, [username])
+
+    useEffect(() => {
+        const fetchPlayerElo = async () => {
+            try {
+                const playerStatsResponse = await fetch(` https://api.chess.com/pub/player/${username}/stats`)
+                if (!playerStatsResponse.ok) {
+                    throw new Error('Failed to fetch user stats')
+                }
+                const playerStats = await playerStatsResponse.json()
+                setPlayerStats(playerStats)
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message)
+                } else {
+                    setError('An unknown error occurred')
+                }
+            }
+        }
+        if (username) {
+            fetchPlayerElo()
         }
     }, [username])
 
@@ -171,8 +226,13 @@ export default function UserPage() {
                     <p>Player league : {userData.league}</p>
                 )}
             </div>
-            <div className="mt-5 w-full max-w-4xl text-foreground">
-                <h2 className="text-xl font-bold mb-4">Last games:</h2>
+            <div className="w-full max-w-4xl text-foreground">
+                <h2 className="text-xl font-bold mb-4">Ranks :</h2>
+                <div className='flex flex-col'>
+                    <span>⚡️ Blitz : {playerStats?.chess_blitz?.last?.rating || 'N/A'}</span>
+                    <span>🕛 Rapid : {playerStats?.chess_rapid?.last?.rating || 'N/A'}</span>
+                </div>
+                <h2 className="text-xl font-bold mb-4 mt-6">Last games :</h2>
                 <div className="grid grid-cols-2 gap-4 mt-8">
                     {games
                         .sort((a, b) => b.end_time - a.end_time)
@@ -180,9 +240,9 @@ export default function UserPage() {
                         .map((game, index) => (
                             <div key={index} className="p-4 border rounded-lg relative">
                                 <div className="absolute top-4 left-4 text-foreground/80">
-                                    {game.time_class === 'bullet' && <Rocket className="w-5 h-5" />}
-                                    {game.time_class === 'blitz' && <Thunderstorm className="w-5 h-5" />}
-                                    {game.time_class === 'rapid' && <Clock className="w-5 h-5" />}
+                                    {game.time_class === 'bullet' && <span className="text-sm">🚀</span>}
+                                    {game.time_class === 'blitz' && <span className="text-sm">⚡️</span>}
+                                    {game.time_class === 'rapid' && <span className="text-sm">🕛</span>}
                                 </div>
                                 <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
                                 <div className="flex justify-between items-center">

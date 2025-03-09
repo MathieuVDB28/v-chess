@@ -17,7 +17,7 @@ export default function Sidebar() {
           <span>User</span>
         </Link>
 
-        <Link href={`/workinginprogress`} className="flex items-center space-x-3 p-2 hover:text-red-500 rounded">
+        <Link href={`/chesscom/user/${username}/compare`} className="flex items-center space-x-3 p-2 hover:text-red-500 rounded">
           <ArrowUnion />
           <span>Compare</span>
         </Link>
