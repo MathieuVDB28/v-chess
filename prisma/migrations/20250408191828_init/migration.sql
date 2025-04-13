@@ -7,6 +7,5 @@
 
 */
 -- AlterTable
-ALTER TABLE "User" DROP COLUMN "name",
 ADD COLUMN     "chesscom_username" TEXT NOT NULL,
 ADD COLUMN     "lichess_username" TEXT NOT NULL;
