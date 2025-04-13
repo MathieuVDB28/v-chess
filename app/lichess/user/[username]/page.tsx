@@ -25,7 +25,8 @@ interface UserData {
 }
 
 export default function UserPage() {
-    const { username } = useParams()
+    const params = useParams();
+    const username = params?.username as string;
     const [userData, setUserData] = useState<UserData | null>(null)
     const [error, setError] = useState<string | null>(null)
 

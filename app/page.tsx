@@ -1,12 +1,15 @@
 'use client'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from "@/app/components/Navbar"
 import Image from 'next/image'
+import { useSession } from 'next-auth/react';
 
 type Platform = 'chesscom' | 'lichess'
 
 export default function Home() {
+    const { data: session, status } = useSession();
     const router = useRouter()
     const [username, setUsername] = useState('')
     const [platform, setPlatform] = useState<Platform>('chesscom')

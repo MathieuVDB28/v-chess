@@ -22,7 +22,7 @@ interface Results {
 
 export default function CompareUser() {
     const params = useParams()
-    const username = typeof params.username === 'string' ? params.username : Array.isArray(params.username) ? params.username[0] : '';
+    const username = typeof params?.username === 'string' ? params.username : Array.isArray(params?.username) ? params.username[0] : '';
     const router = useRouter()
     const [opponentUsername, setOpponentUsername] = useState('')
     const [isLoading, setIsLoading] = useState(false)

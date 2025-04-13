@@ -10,9 +10,11 @@ interface UserData {
 }
 
 export default function Navbar() {
-    const { username } = useParams()
+    const params = useParams();
+    const username = params?.username as string;
+
     const [userData, setUserData] = useState<UserData | null>(null)
-    const [countryCode, setCountryCode] = useState(null)
+    const [countryCode, setCountryCode] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
@@ -47,7 +49,7 @@ export default function Navbar() {
             fetchData()
         }
     }, [username])
-    
+
     if (error) {
         return <div>Error: {error}</div>
     }

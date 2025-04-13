@@ -16,6 +16,7 @@ export default {
         sidebar: "hsl(var(--card))",
         input: "hsl(var(--input))",
         chart4: "hsl(var(--chart-4))",
+        destructive: "hsl(var(--destructive))",
       },
     },
   },

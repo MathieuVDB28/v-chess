@@ -55,11 +55,27 @@ interface PlayerStats {
             draw: number;
         };
     };
+    chess_bullet: {
+        last: {
+            rating: number;
+            date: number;
+        };
+        best: {
+            rating: number;
+            date: number;
+        };
+        record: {
+            win: number;
+            loss: number;
+            draw: number;
+        };
+    };
 }
 
 export default function UserPage() {
     const router = useRouter()
-    const { username } = useParams()
+    const params = useParams();
+    const username = params?.username as string;
     const [userData, setUserData] = useState<UserData | null>(null)
     const [countryCode, setCountryCode] = useState(null)
     const [games, setGames] = useState<Game[]>([])
@@ -217,7 +233,7 @@ export default function UserPage() {
     }
 
     return (
-        <div className="p-8 flex flex-col items-center">
+        <div className="pt-8 pl-8 pr-8 pb-4 flex flex-col items-center">
             <div className="text-center text-foreground">
                 {userData?.status && (
                     <p>{userData.status.charAt(0).toUpperCase() + userData.status.slice(1)} player</p>
@@ -229,6 +245,7 @@ export default function UserPage() {
             <div className="w-full max-w-4xl text-foreground">
                 <h2 className="text-xl font-bold mb-4">Ranks :</h2>
                 <div className='flex flex-col'>
+                    <span>🚀️ Bullet : {playerStats?.chess_bullet?.last?.rating || 'N/A'}</span>
                     <span>⚡️ Blitz : {playerStats?.chess_blitz?.last?.rating || 'N/A'}</span>
                     <span>🕛 Rapid : {playerStats?.chess_rapid?.last?.rating || 'N/A'}</span>
                 </div>

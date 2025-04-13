@@ -38,7 +38,8 @@ const months: SelectOption[] = [
 ]
 
 export default function AllGamesPage() {
-    const { username } = useParams()
+    const params = useParams();
+    const username = params?.username as string;
     const router = useRouter()
     const [games, setGames] = useState<Game[]>([])
     const [error, setError] = useState<string | null>(null)
