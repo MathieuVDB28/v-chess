@@ -1,6 +1,7 @@
 'use client'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { Menu } from 'iconoir-react'
 
 interface UserData {
     avatar?: string;
@@ -9,6 +10,12 @@ interface UserData {
     country?: string;
 }
 
+// Création d'un contexte pour partager l'état du sidebar entre les composants
+export const toggleSidebar = () => {
+    const event = new CustomEvent('toggleSidebar');
+    window.dispatchEvent(event);
+};
+
 export default function Navbar() {
     const params = useParams();
     const username = params?.username as string;
@@ -16,6 +23,23 @@ export default function Navbar() {
     const [userData, setUserData] = useState<UserData | null>(null)
     const [countryCode, setCountryCode] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [isMobile, setIsMobile] = useState(false)
+
+    useEffect(() => {
+        // Fonction pour détecter si l'écran est de taille mobile
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        // Vérifier dès le début
+        checkIfMobile();
+
+        // Ajouter un écouteur d'événement pour les changements de taille
+        window.addEventListener('resize', checkIfMobile);
+
+        // Nettoyer l'écouteur d'événement
+        return () => window.removeEventListener('resize', checkIfMobile);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,17 +83,29 @@ export default function Navbar() {
     }
 
     return (
-        <div className="pt-8 flex flex-col items-center">
-            <div className="flex items-center gap-4">
-                {userData?.avatar && (
-                    <img
-                        src={userData.avatar}
-                        alt={`${username}'s avatar`}
-                        className="rounded-full"
-                        width={100}
-                        height={100}
-                    />
-                )}
+        <div className="pt-8 flex flex-col items-center relative">
+
+            <div className="flex items-center justify-center gap-4">
+                {/* Bouton menu burger pour mobile, affiché uniquement en mode mobile */}
+                <div>
+                    {isMobile && (
+                        <button
+                            onClick={toggleSidebar}
+                            className="p-2 rounded-md text-white hover:bg-primary transition-colors"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                    )}
+                </div>
+                <div className="w-[50px] h-[50px] md:w-[100px] md:h-[100px]">
+                    {userData?.avatar && (
+                        <img
+                            src={userData.avatar}
+                            alt={`${username}'s avatar`}
+                            className="rounded-full w-full h-full object-cover"
+                        />
+                    )}
+                </div>
                 <h1 className="text-2xl font-bold text-primary">{username}</h1>
                 {countryCode && (
                     <img

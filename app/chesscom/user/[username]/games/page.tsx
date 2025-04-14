@@ -121,9 +121,9 @@ export default function AllGamesPage() {
                         months[new Date().getMonth()].label
 
     return (
-        <div className="p-8">
+        <div className="lg:p-8 mt-8">
             <div className="max-w-4xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold text-foreground">
                         {currentMonth} {selectedYear} games played :
                     </h1>
@@ -158,7 +158,7 @@ export default function AllGamesPage() {
                         <span className="text-foreground">No games found for this period. Try to change the month for view games.</span>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid lg:grid-cols-2 gap-4">
                         {games
                             .sort((a, b) => b.end_time - a.end_time)
                             .map((game, index) => (
@@ -168,8 +168,33 @@ export default function AllGamesPage() {
                                         {game.time_class === 'blitz' && <span className="text-sm">⚡️</span>}
                                         {game.time_class === 'rapid' && <span className="text-sm">🕛</span>}
                                     </div>
-                                    <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
                                     <div className="flex justify-between items-center">
+                                        <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
+                                        <div className="font-medium flex items-center gap-2">
+                                            {game.white.username === username
+                                                ? (
+                                                    <>
+                                                        <div>
+                                                        <span className={`${game.white.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm flex justify-center items-center w-6`}>
+                                                            {game.white.result === 'win' ? '+' : '-'}
+                                                        </span>
+                                                        </div>
+                                                        <span className="text-foreground">({game.white.result === 'win' ? game.black.result : game.white.result})</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div>
+                                                        <span className={`${game.black.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm flex justify-center items-center w-6`}>
+                                                            {game.black.result === 'win' ? '+' : '-'}
+                                                        </span>
+                                                        </div>
+                                                        <span className="text-foreground">({game.black.result === 'win' ? game.white.result : game.black.result})</span>
+                                                    </>
+                                                )
+                                            }
+                                        </div>
+                                    </div>
+                                    <div className="mt-2">
                                         <div className="flex-1">
                                             <p className="text-sm flex items-center gap-2 text-foreground">
                                                 White:
@@ -180,8 +205,8 @@ export default function AllGamesPage() {
                                                         className="text-foreground hover:text-chart4 cursor-pointer"
                                                         onClick={() => router.push(`/user/${game.white.username}`)}
                                                     >
-                                                        {game.white.username}
-                                                    </span>
+                                                    {game.white.username}
+                                                </span>
                                                 )}
                                                 {playerFlags[game.white.username] && (
                                                     <img
@@ -203,8 +228,8 @@ export default function AllGamesPage() {
                                                         className="text-foreground hover:text-chart4 cursor-pointer"
                                                         onClick={() => router.push(`/user/${game.black.username}`)}
                                                     >
-                                                        {game.black.username}
-                                                    </span>
+                                                    {game.black.username}
+                                                </span>
                                                 )}
                                                 {playerFlags[game.black.username] && (
                                                     <img
@@ -217,31 +242,6 @@ export default function AllGamesPage() {
                                                     <span className="text-sm">{game.black.rating}</span>
                                                 )}
                                             </p>
-                                        </div>
-                                        <div className="text-sm flex-1 flex">
-                                            <div className="font-medium flex justify-end items-center gap-2 w-full">
-                                                {game.white.username === username
-                                                    ? (
-                                                        <>
-                                                            <div>
-                                                                <span className={`${game.white.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
-                                                                    {game.white.result === 'win' ? '+' : '-'}
-                                                                </span>
-                                                            </div>
-                                                            <span className="text-foreground">({game.white.result === 'win' ? game.black.result : game.white.result})</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div>
-                                                                <span className={`${game.black.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
-                                                                    {game.black.result === 'win' ? '+' : '-'}
-                                                                </span>
-                                                            </div>
-                                                            <span className="text-foreground">({game.black.result === 'win' ? game.white.result : game.black.result})</span>
-                                                        </>
-                                                    )
-                                                }
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

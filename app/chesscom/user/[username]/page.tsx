@@ -1,6 +1,6 @@
 'use client'
-import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import {useParams, useRouter} from 'next/navigation'
+import {useEffect, useState} from 'react'
 import dayjs from 'dayjs'
 
 interface Player {
@@ -233,7 +233,7 @@ export default function UserPage() {
     }
 
     return (
-        <div className="pt-8 pl-8 pr-8 pb-4 flex flex-col items-center">
+        <div className="pt-8 lg:pl-8 lg:pr-8 pb-4 flex flex-col items-center">
             <div className="text-center text-foreground">
                 {userData?.status && (
                     <p>{userData.status.charAt(0).toUpperCase() + userData.status.slice(1)} player</p>
@@ -250,7 +250,7 @@ export default function UserPage() {
                     <span>🕛 Rapid : {playerStats?.chess_rapid?.last?.rating || 'N/A'}</span>
                 </div>
                 <h2 className="text-xl font-bold mb-4 mt-6">Last games :</h2>
-                <div className="grid grid-cols-2 gap-4 mt-8">
+                <div className="grid lg:grid-cols-2 gap-4 mt-8">
                     {games
                         .sort((a, b) => b.end_time - a.end_time)
                         .slice(0, 6)
@@ -261,8 +261,37 @@ export default function UserPage() {
                                     {game.time_class === 'blitz' && <span className="text-sm">⚡️</span>}
                                     {game.time_class === 'rapid' && <span className="text-sm">🕛</span>}
                                 </div>
-                                <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
                                 <div className="flex justify-between items-center">
+                                    <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
+                                    <div className="font-medium flex items-center gap-2">
+                                        {game.white.username === username
+                                            ? (
+                                                <>
+                                                    <div>
+                                                        <span
+                                                            className={`${game.white.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm flex justify-center items-center w-6`}>
+                                                            {game.white.result === 'win' ? '+' : '-'}
+                                                        </span>
+                                                    </div>
+                                                    <span
+                                                        className="text-foreground">({game.white.result === 'win' ? game.black.result : game.white.result})</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div>
+                                                        <span
+                                                            className={`${game.black.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm flex justify-center items-center w-6`}>
+                                                            {game.black.result === 'win' ? '+' : '-'}
+                                                        </span>
+                                                    </div>
+                                                    <span
+                                                        className="text-foreground">({game.black.result === 'win' ? game.white.result : game.black.result})</span>
+                                                </>
+                                            )
+                                        }
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center gap-2 mt-2">
                                     <div className="flex-1">
                                         <p className="text-sm flex items-center gap-2">
                                             White:
@@ -310,31 +339,6 @@ export default function UserPage() {
                                                 <span className="text-sm">{game.black.rating}</span>
                                             )}
                                         </p>
-                                    </div>
-                                    <div className="text-sm flex-1 flex">
-                                        <div className="font-medium flex justify-end items-center gap-2 w-full">
-                                            {game.white.username === username
-                                                ? (
-                                                    <>
-                                                        <div>
-                                                            <span className={`${game.white.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
-                                                                {game.white.result === 'win' ? '+' : '-'}
-                                                            </span>
-                                                        </div>
-                                                        <span className="text-foreground">({game.white.result === 'win' ? game.black.result : game.white.result})</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <div>
-                                                            <span className={`${game.black.result === 'win' ? 'bg-green-500' : 'bg-red-500'} text-background rounded-sm mx-auto flex justify-center items-center w-6`}>
-                                                                {game.black.result === 'win' ? '+' : '-'}
-                                                            </span>
-                                                        </div>
-                                                        <span className="text-foreground">({game.black.result === 'win' ? game.white.result : game.black.result})</span>
-                                                    </>
-                                                )
-                                            }
-                                        </div>
                                     </div>
                                 </div>
                             </div>
