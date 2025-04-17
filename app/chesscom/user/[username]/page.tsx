@@ -243,14 +243,14 @@ export default function UserPage() {
                 )}
             </div>
             <div className="w-full max-w-4xl text-foreground">
-                <h2 className="text-xl font-bold mb-4">Ranks :</h2>
+                <h2 className="text-xl font-bold mb-2">Ranks :</h2>
                 <div className='flex flex-col'>
                     <span>🚀️ Bullet : {playerStats?.chess_bullet?.last?.rating || 'N/A'}</span>
                     <span>⚡️ Blitz : {playerStats?.chess_blitz?.last?.rating || 'N/A'}</span>
                     <span>🕛 Rapid : {playerStats?.chess_rapid?.last?.rating || 'N/A'}</span>
                 </div>
-                <h2 className="text-xl font-bold mb-4 mt-6">Last games :</h2>
-                <div className="grid lg:grid-cols-2 gap-4 mt-8">
+                <h2 className="text-xl font-bold mt-4">Last games :</h2>
+                <div className="grid lg:grid-cols-2 gap-4 mt-4">
                     {games
                         .sort((a, b) => b.end_time - a.end_time)
                         .slice(0, 6)

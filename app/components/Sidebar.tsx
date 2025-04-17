@@ -13,25 +13,19 @@ export default function Sidebar() {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        // Fonction pour détecter si l'écran est de taille mobile
         const checkIfMobile = () => {
             setIsMobile(window.innerWidth < 768);
         };
-
-        // Vérifier dès le début
         checkIfMobile();
 
-        // Ajouter un écouteur d'événement pour les changements de taille
         window.addEventListener('resize', checkIfMobile);
 
-        // Écouter l'événement de basculement du sidebar
         const handleToggleSidebar = () => {
             setIsSidebarOpen(prevState => !prevState);
         };
 
         window.addEventListener('toggleSidebar', handleToggleSidebar);
 
-        // Nettoyer les écouteurs d'événements
         return () => {
             window.removeEventListener('resize', checkIfMobile);
             window.removeEventListener('toggleSidebar', handleToggleSidebar);
@@ -39,11 +33,7 @@ export default function Sidebar() {
     }, []);
 
     const userLink = status === "authenticated" ? '/account' : '/auth/signup';
-
-    // Génère les classes CSS pour la sidebar en fonction de l'état
     const sidebarClasses = `${isMobile ? 'fixed left-0 top-0 h-screen w-60 bg-sidebar text-white p-4 flex flex-col transition-transform duration-300 z-20' : 'fixed left-0 top-0 h-screen w-60 bg-sidebar text-white p-4 flex flex-col'} ${isMobile && !isSidebarOpen ? '-translate-x-full' : ''}`;
-
-    // Ferme le sidebar quand on clique sur un lien (en mode mobile)
     const closeSidebar = () => {
         if (isMobile) {
             setIsSidebarOpen(false);
@@ -52,7 +42,6 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* Overlay quand la sidebar est ouverte sur mobile */}
             {isMobile && isSidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-10"
@@ -60,10 +49,8 @@ export default function Sidebar() {
                 />
             )}
 
-            {/* Sidebar */}
             <div className={sidebarClasses}>
-                <div className="flex gap-6 items-center mt-4">
-                    {/* Bouton pour fermer la sidebar (visible uniquement en mode mobile) */}
+                <div className="flex sm:block gap-6 text-center items-center mt-4">
                     {isMobile && (
                         <button
                             onClick={closeSidebar}
