@@ -86,7 +86,7 @@ export default function Home() {
                         />
                         <button 
                             className="
-                            bg-primary text-background border-2 border-background px-4 py-2 rounded-lg transition-colors
+                            bg-primary text-background border-2 border-background px-4 py-2 rounded-lg transition-all duration-700
                             hover:bg-background hover:text-primary hover:border-2 hover:border-primary"
                             onClick={handleSubmit}
                         >

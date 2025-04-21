@@ -18,7 +18,9 @@ export default function Navbar() {
     return (
         <nav className="flex items-center justify-between w-full p-4">
             <div className="w-10"></div>
-            <h1 className="text-2xl font-bold text-primary">v-chess</h1>
+            <Link href="/">
+                <h1 className="text-2xl font-bold text-primary">v-chess</h1>
+            </Link>
             <div className="flex items-center space-x-4">
                 <Link href={userLink}>
                     <User className="text-white"/>

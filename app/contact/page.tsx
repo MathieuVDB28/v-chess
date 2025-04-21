@@ -40,7 +40,7 @@ export default function ContactPage() {
                                               placeholder="Message">
                                     </textarea>
                                     <button
-                                        className="w-full h-12 text-center text-white text-base font-semibold leading-6 rounded-full bg-primary shadow transition-all duration-700 hover:bg-indigo-800">
+                                        className="w-full h-12 text-center text-white text-base font-semibold leading-6 rounded-full bg-primary shadow transition-all duration-700 hover:bg-background hover:text-primary hover:border-2 hover:border-primary">
                                         Submit
                                     </button>
                                 </form>
