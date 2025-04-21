@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link';
 import {useParams} from 'next/navigation'
-import {User, Reports, ArcheryMatch, TriangleFlag, UserCircle, Menu, X} from 'iconoir-react'
+import {User, Reports, ArcheryMatch, TriangleFlag, UserCircle, Menu, HelpCircleSolid} from 'iconoir-react'
 import {useSession} from "next-auth/react";
 import { useState, useEffect } from 'react';
 
@@ -94,12 +94,17 @@ export default function Sidebar() {
                     </Link>
                 </nav>
 
-                <div className="mt-auto pb-4">
+                <div className="mt-auto pb-4 flex gap-6">
                     <Link href={userLink}
                           className="flex items-center space-x-3 p-2 hover:text-primary rounded"
                           onClick={closeSidebar}>
                         <UserCircle/>
                         <span>My account</span>
+                    </Link>
+                    <Link href={"/contact"}
+                          className="flex items-center space-x-3 p-2 hover:text-primary rounded"
+                          onClick={closeSidebar}>
+                        <HelpCircleSolid/>
                     </Link>
                 </div>
             </div>

@@ -4,7 +4,7 @@ import Footer from '@/app/components/Footer'
 
 export default function UserLayout({ children }) {
     return (
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex overflow-hidden">
             <Sidebar className="fixed h-screen w-64" />
             <div className="flex flex-col w-full lg:ml-64">
                 <Navbar />

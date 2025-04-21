@@ -79,7 +79,7 @@ export default function Home() {
                         </div>
                         <input
                             type="text"
-                            placeholder={`Enter your ${platform === 'chesscom' ? 'Chess.com' : 'Lichess'} username`}
+                            placeholder={`Enter ${platform === 'chesscom' ? 'Chess.com' : 'Lichess'} username`}
                             className="border-2 border-input bg-background text-foreground p-2 rounded-lg w-64 sm:w-80"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
