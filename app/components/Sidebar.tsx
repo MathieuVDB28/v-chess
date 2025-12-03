@@ -1,13 +1,15 @@
 'use client'
+
 import Link from 'next/link';
-import {useParams} from 'next/navigation'
+import {useParams, usePathname} from 'next/navigation'
 import {User, Reports, ArcheryMatch, TriangleFlag, UserCircle, Menu, HelpCircleSolid} from 'iconoir-react'
 import {useSession} from "next-auth/react";
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 
 export default function Sidebar() {
     const params = useParams();
     const username = params?.username as string;
+    const pathname = usePathname();
     const {data: session, status} = useSession();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -56,7 +58,7 @@ export default function Sidebar() {
                             onClick={closeSidebar}
                             className="p-2 text-white hover:text-primary transition-colors"
                         >
-                            <Menu className="w-6 h-6" />
+                            <Menu className="w-6 h-6"/>
                         </button>
                     )}
                     <Link href={`/`} onClick={closeSidebar}>
@@ -66,28 +68,28 @@ export default function Sidebar() {
 
                 <nav className="mt-10 space-y-6 flex-grow">
                     <Link href={`/chesscom/user/${username}`}
-                          className="flex items-center space-x-3 p-2 hover:text-chart4 rounded"
+                          className={`${pathname === `/chesscom/user/${username}` ? 'text-chart4' : ''} flex items-center space-x-3 p-2 hover:text-chart4 rounded`}
                           onClick={closeSidebar}>
                         <User/>
                         <span>User</span>
                     </Link>
 
                     <Link href={`/chesscom/user/${username}/compare`}
-                          className="flex items-center space-x-3 p-2 hover:text-red-500 rounded"
+                          className={`${pathname === `/chesscom/user/${username}/compare` ? 'text-red-500' : ''} flex items-center space-x-3 p-2 hover:text-red-500 rounded`}
                           onClick={closeSidebar}>
                         <ArcheryMatch/>
                         <span>Compare</span>
                     </Link>
 
                     <Link href={`/workinginprogress`}
-                          className="flex items-center space-x-3 p-2 hover:text-yellow-400 rounded"
+                          className={`${pathname === `/chesscom/user/${username}/goals` ? 'text-yellow-400' : ''} flex items-center space-x-3 p-2 hover:text-yellow-400 rounded`}
                           onClick={closeSidebar}>
                         <TriangleFlag/>
                         <span>Goals</span>
                     </Link>
 
                     <Link href={`/workinginprogress`}
-                          className="flex items-center space-x-3 p-2 hover:text-orange-500 rounded"
+                          className={`${pathname === `/chesscom/user/${username}/stats` ? 'text-orange-500' : ''} flex items-center space-x-3 p-2 hover:text-orange-500 rounded`}
                           onClick={closeSidebar}>
                         <Reports/>
                         <span>Stats</span>
@@ -96,7 +98,7 @@ export default function Sidebar() {
 
                 <div className="mt-auto pb-4 flex gap-6">
                     <Link href={userLink}
-                          className="flex items-center space-x-3 p-2 hover:text-primary rounded"
+                          className="flex items-center space-x-3 p-2 text-primary rounded hover:text-white"
                           onClick={closeSidebar}>
                         <UserCircle/>
                         <span>My account</span>

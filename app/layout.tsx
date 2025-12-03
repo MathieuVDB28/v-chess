@@ -18,14 +18,14 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-        <body
-            className={inter.className}
-        >
-            <main className="mx-auto max-w-5xl w-full px-4">
-                <AuthProvider>{children}</AuthProvider>
-                <Analytics />
-            </main>
-        </body>
+            <body
+                className={inter.className}
+            >
+                <main className="mx-auto max-w-5xl w-full px-4">
+                    <AuthProvider>{children}</AuthProvider>
+                    <Analytics />
+                </main>
+            </body>
         </html>
     );
 }

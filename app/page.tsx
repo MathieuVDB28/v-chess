@@ -61,8 +61,8 @@ export default function Home() {
                                 />
                             </button>
                             <button
-                                onClick={() => setPlatform('lichess')}
-                                className={`p-2 rounded-lg transition-all ${
+                                // onClick={() => setPlatform('lichess')}
+                                className={`opacity-50 cursor-not-allowed p-2 rounded-lg transition-all ${
                                     platform === 'lichess' 
                                         ? 'bg-primary/10 ring-2 ring-primary' 
                                         : 'hover:bg-foreground/5'

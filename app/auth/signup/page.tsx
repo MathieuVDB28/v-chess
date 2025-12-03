@@ -2,6 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Mail, Lock, User, Check } from 'iconoir-react';
+import Image from 'next/image';
+import Navbar from '@/app/components/Navbar';
 
 export default function SignUpPage() {
     const [formData, setFormData] = useState({
@@ -13,6 +17,7 @@ export default function SignUpPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [focusedField, setFocusedField] = useState<string | null>(null);
     const router = useRouter();
 
     const handleChange = (e:any) => {
@@ -82,143 +87,251 @@ export default function SignUpPage() {
     };
 
     return (
-        <section className="bg-gray-50 dark:bg-gray-900">
-            <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                    <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
-                         alt="logo"/>
-                    V-chess
-                </a>
-                <div
-                    className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                    <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-                        <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                            Create an account
-                        </h1>
+        <div className="min-h-screen flex flex-col bg-background">
+            <Navbar />
+
+            <div className="flex-grow flex items-center justify-center px-4 py-12">
+                <div className="w-full max-w-lg">
+                    {/* Logo/Title Section with animation */}
+                    <div className="text-center mb-8 animate-in fade-in slide-in-from-top duration-700">
+                        <p className="text-foreground/60 text-xl">
+                            Créez votre compte pour commencer
+                        </p>
+                    </div>
+
+                    {/* Main Form Card */}
+                    <div className="bg-card/50 backdrop-blur-sm border border-primary/10 rounded-2xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom duration-700">
                         {error && (
-                            <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                                {error}
+                            <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top duration-300">
+                                <div className="w-1 h-12 bg-destructive rounded-full" />
+                                <p className="text-sm">{error}</p>
                             </div>
                         )}
-                        <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-                            <div>
-                                <label htmlFor="email"
-                                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    Your email
-                                </label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    id="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    placeholder="name@email.com"
-                                    required
-                                />
-                            </div>
 
-                            {/* Chess.com username field with icon */}
-                            <div>
-                                <label htmlFor="chesscom_username"
-                                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    <div className="flex items-center">
-                                        <img
-                                            src="https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/SamCopeland/phpmeXx6V.png"
-                                            alt="Chess.com"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Chess.com username
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            {/* Email Field */}
+                            <div className="space-y-2">
+                                <label htmlFor="email" className="block text-sm font-medium text-foreground/80">
+                                    Email
+                                </label>
+                                <div className="relative group">
+                                    <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+                                        focusedField === 'email' ? 'text-primary' : 'text-foreground/40'
+                                    }`}>
+                                        <Mail className="w-5 h-5" />
                                     </div>
-                                </label>
-                                <input
-                                    type="text"
-                                    name="chesscom_username"
-                                    id="chesscom_username"
-                                    value={formData.chesscom_username}
-                                    onChange={handleChange}
-                                    placeholder="chesscom_user"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                />
-                            </div>
-
-                            {/* Lichess username field with icon */}
-                            <div>
-                                <label htmlFor="lichess_username"
-                                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    <div className="flex items-center">
-                                        <img
-                                            src="https://lichess1.org/assets/logo/lichess-favicon-32.png"
-                                            alt="Lichess"
-                                            className="w-5 h-5 mr-2"
-                                        />
-                                        Lichess username
-                                    </div>
-                                </label>
-                                <input
-                                    type="text"
-                                    name="lichess_username"
-                                    id="lichess_username"
-                                    value={formData.lichess_username}
-                                    onChange={handleChange}
-                                    placeholder="lichess_user"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="password"
-                                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    Password
-                                </label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    id="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    placeholder="••••••••"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    required
-                                />
-                            </div>
-                            <div className="flex items-start">
-                                <div className="flex items-center h-5">
                                     <input
-                                        id="terms"
-                                        aria-describedby="terms"
-                                        type="checkbox"
-                                        checked={termsAccepted}
-                                        onChange={handleCheckboxChange}
-                                        className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        onFocus={() => setFocusedField('email')}
+                                        onBlur={() => setFocusedField(null)}
+                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                                 text-foreground placeholder:text-foreground/30
+                                                 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
+                                                 transition-all duration-300"
+                                        placeholder="votre@email.com"
                                         required
                                     />
                                 </div>
-                                <div className="ml-3 text-sm">
-                                    <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">
-                                        I accept the <a
-                                        className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                                        href="#">Terms and Conditions</a>
-                                    </label>
+                            </div>
+
+                            {/* Chess.com Username */}
+                            <div className="space-y-2">
+                                <label htmlFor="chesscom_username" className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+                                    <Image
+                                        src="/img/chesscom_logo.png"
+                                        alt="Chess.com"
+                                        width={20}
+                                        height={20}
+                                        className="w-5 h-5"
+                                    />
+                                    <span>Chess.com username (optionnel)</span>
+                                </label>
+                                <div className="relative group">
+                                    <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+                                        focusedField === 'chesscom' ? 'text-primary' : 'text-foreground/40'
+                                    }`}>
+                                        <User className="w-5 h-5" />
+                                    </div>
+                                    <input
+                                        id="chesscom_username"
+                                        type="text"
+                                        name="chesscom_username"
+                                        value={formData.chesscom_username}
+                                        onChange={handleChange}
+                                        onFocus={() => setFocusedField('chesscom')}
+                                        onBlur={() => setFocusedField(null)}
+                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                                 text-foreground placeholder:text-foreground/30
+                                                 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
+                                                 transition-all duration-300"
+                                        placeholder="votre_pseudo"
+                                    />
                                 </div>
                             </div>
+
+                            {/* Lichess Username */}
+                            <div className="space-y-2">
+                                <label htmlFor="lichess_username" className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+                                    <Image
+                                        src="/img/lichess_logo.png"
+                                        alt="Lichess"
+                                        width={20}
+                                        height={20}
+                                        className="w-5 h-5"
+                                    />
+                                    <span>Lichess username (optionnel)</span>
+                                </label>
+                                <div className="relative group">
+                                    <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+                                        focusedField === 'lichess' ? 'text-primary' : 'text-foreground/40'
+                                    }`}>
+                                        <User className="w-5 h-5" />
+                                    </div>
+                                    <input
+                                        id="lichess_username"
+                                        type="text"
+                                        name="lichess_username"
+                                        value={formData.lichess_username}
+                                        onChange={handleChange}
+                                        onFocus={() => setFocusedField('lichess')}
+                                        onBlur={() => setFocusedField(null)}
+                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                                 text-foreground placeholder:text-foreground/30
+                                                 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
+                                                 transition-all duration-300"
+                                        placeholder="votre_pseudo"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Password Field */}
+                            <div className="space-y-2">
+                                <label htmlFor="password" className="block text-sm font-medium text-foreground/80">
+                                    Mot de passe
+                                </label>
+                                <div className="relative group">
+                                    <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+                                        focusedField === 'password' ? 'text-primary' : 'text-foreground/40'
+                                    }`}>
+                                        <Lock className="w-5 h-5" />
+                                    </div>
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        onFocus={() => setFocusedField('password')}
+                                        onBlur={() => setFocusedField(null)}
+                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                                 text-foreground placeholder:text-foreground/30
+                                                 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
+                                                 transition-all duration-300"
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                </div>
+                                <p className="text-xs text-foreground/50">Minimum 8 caractères</p>
+                            </div>
+
+                            {/* Terms Checkbox */}
+                            <div className="flex items-start gap-3 p-4 rounded-lg bg-background/50 border border-input/50">
+                                <div className="relative flex items-center">
+                                    <input
+                                        id="terms"
+                                        type="checkbox"
+                                        checked={termsAccepted}
+                                        onChange={handleCheckboxChange}
+                                        className="w-5 h-5 rounded border-2 border-input bg-background
+                                                 checked:bg-primary checked:border-primary
+                                                 focus:outline-none focus:ring-2 focus:ring-primary/20
+                                                 transition-all duration-300 cursor-pointer
+                                                 appearance-none relative
+                                                 checked:after:content-['✓'] checked:after:absolute
+                                                 checked:after:top-1/2 checked:after:left-1/2
+                                                 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
+                                                 checked:after:text-background checked:after:text-xs checked:after:font-bold"
+                                        required
+                                    />
+                                </div>
+                                <label htmlFor="terms" className="text-sm text-foreground/70 cursor-pointer select-none">
+                                    J'accepte les{' '}
+                                    <Link href="#" className="text-primary hover:underline font-medium">
+                                        conditions générales
+                                    </Link>
+                                    {' '}et la{' '}
+                                    <Link href="#" className="text-primary hover:underline font-medium">
+                                        politique de confidentialité
+                                    </Link>
+                                </label>
+                            </div>
+
+                            {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full text-white bg-primary-600 bg-primary rounded-lg text-sm px-5 py-2.5 text-center"
+                                className="w-full bg-primary text-background font-semibold py-3 px-4 rounded-lg
+                                         hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20
+                                         focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background
+                                         disabled:opacity-50 disabled:cursor-not-allowed
+                                         transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]
+                                         flex items-center justify-center gap-2 group"
                             >
-                                {loading ? 'Création en cours...' : 'Create an account'}
+                                {loading ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+                                        <span>Création en cours...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Check className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                        <span>Créer mon compte</span>
+                                    </>
+                                )}
                             </button>
-                            <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Already have an account? <a href="/auth/signin"
-                                 className="font-medium text-primary-600 text-primary hover:underline">
-                                Login
-                            </a>
-                            </p>
                         </form>
+
+                        {/* Divider */}
+                        <div className="relative my-8">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-input"></div>
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-card px-2 text-foreground/50">
+                                    ou
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Sign In Link */}
+                        <div className="text-center">
+                            <p className="text-sm text-foreground/60">
+                                Vous avez déjà un compte ?{' '}
+                                <Link
+                                    href="/auth/signin"
+                                    className="text-primary font-medium hover:underline hover:text-primary/80 transition-colors duration-300"
+                                >
+                                    Se connecter
+                                </Link>
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Footer Link */}
+                    <div className="mt-8 text-center animate-in fade-in duration-1000 delay-300">
+                        <Link
+                            href="/"
+                            className="text-sm text-foreground/40 hover:text-primary transition-colors duration-300"
+                        >
+                            ← Retour à l'accueil
+                        </Link>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     );
 }

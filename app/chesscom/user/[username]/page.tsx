@@ -344,16 +344,15 @@ export default function UserPage() {
                             </div>
                         ))}
                 </div>
-                {games.length > 5 && (
-                    <div className="mt-10 text-center">
-                        <button
-                            onClick={() => router.push(`/chesscom/user/${username}/games`)}
-                            className="px-4 py-2 bg-primary text-background rounded hover:bg-background hover:border-primary hover:text-primary transition-colors"
-                        >
-                            See all the user games
-                        </button>
-                    </div>
-                )}
+                <div className="mt-10 text-center">
+                    <button
+                        onClick={() => router.push(`/chesscom/user/${username}/games`)}
+                        className="px-4 py-2 bg-primary text-background rounded transition-colors
+                           hover:bg-background hover:border-primary hover:border-2 hover:text-primary"
+                    >
+                        See all the user games
+                    </button>
+                </div>
             </div>
         </div>
     )
