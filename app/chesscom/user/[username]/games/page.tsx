@@ -15,6 +15,7 @@ interface Game {
     white: Player;
     black: Player;
     time_class: string;
+    url: string;
 }
 
 interface SelectOption {
@@ -168,7 +169,15 @@ export default function AllGamesPage() {
                                         {game.time_class === 'blitz' && <span className="text-sm">⚡️</span>}
                                         {game.time_class === 'rapid' && <span className="text-sm">🕛</span>}
                                     </div>
-                                    <div className="flex justify-between items-center">
+                                    <a
+                                        href={game.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="absolute top-4 right-4 text-primary hover:text-primary/80 text-xs font-medium hover:underline transition-colors"
+                                    >
+                                        View
+                                    </a>
+                                    <div className="flex justify-between items-center pr-12">
                                         <p className="font-semibold text-foreground ml-8">{formatDate(game.end_time)}</p>
                                         <div className="font-medium flex items-center gap-2">
                                             {game.white.username === username
