@@ -15,6 +15,13 @@ export default {
         primary: "hsl(var(--primary))",
         sidebar: "hsl(var(--card))",
         input: "hsl(var(--input))",
+        card: "hsl(var(--card))",
+        border: "hsl(var(--border))",
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        "chart-3": "hsl(var(--chart-3))",
         chart4: "hsl(var(--chart-4))",
         destructive: "hsl(var(--destructive))",
       },

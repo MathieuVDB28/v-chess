@@ -92,7 +92,6 @@ export default function SignUpPage() {
 
             <div className="flex-grow flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-lg">
-                    {/* Logo/Title Section with animation */}
                     <div className="text-center mb-8 animate-in fade-in slide-in-from-top duration-700">
                         <p className="text-foreground/60 text-xl">
                             Créez votre compte pour commencer
