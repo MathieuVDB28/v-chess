@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -10,10 +10,17 @@ import { Reports, TriangleFlag, Trophy, GraphUp, TriangleFlagCircle, User, Arrow
 type Platform = 'chesscom' | 'lichess'
 
 export default function Home() {
-    const { data: session } = useSession()
+    const { data: session, status } = useSession()
     const router = useRouter()
     const [username, setUsername] = useState('')
     const [platform, setPlatform] = useState<Platform>('chesscom')
+
+    // Redirect authenticated users to their Chess.com profile
+    useEffect(() => {
+        if (status === 'authenticated' && session?.user?.chesscom_username) {
+            router.push(`/chesscom/user/${session.user.chesscom_username}`)
+        }
+    }, [status, session, router])
 
     const handleSubmit = async () => {
         try {

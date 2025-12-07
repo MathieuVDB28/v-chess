@@ -58,25 +58,17 @@ export default function UserPage() {
 
     return (
         <div className="p-8 flex flex-col items-center">
-            <div className="flex items-center gap-4 mb-4">
-                <h1 className="text-2xl font-bold text-primary">{userData.username}</h1>
-                {userData.profile?.country && (
-                    <img
-                        src={`https://flagsapi.com/${userData.profile.country}/flat/64.png`}
-                        alt={`${userData.profile.country} flag`}
-                        className="w-8 h-8"
-                    />
-                )}
-            </div>
             {userData.perfs && (
-                <div className="text-center text-foreground mt-6">
-                    <h2 className="text-xl font-semibold mb-4">Ratings</h2>
-                    <div className="grid grid-cols-2 gap-4">
+                <div className="text-center text-foreground mt-6 max-w-4xl w-full">
+                    <h2 className="text-xl font-semibold mb-6 text-primary">Classements</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {Object.entries(userData.perfs).map(([key, value]) => (
-                            <div key={key} className="p-4 border rounded-lg">
-                                <p className="font-medium capitalize">{key}</p>
-                                <p>Rating: {value.rating}</p>
-                                <p>Games: {value.games}</p>
+                            <div key={key} className="bg-card/50 backdrop-blur-sm border border-primary/10 rounded-xl p-6 hover:border-primary/20 transition-all duration-300">
+                                <p className="font-semibold capitalize text-foreground mb-3 text-lg">{key}</p>
+                                <div className="space-y-2 text-foreground/70">
+                                    <p><span className="text-primary font-medium">{value.rating}</span> ELO</p>
+                                    <p className="text-sm">{value.games} parties</p>
+                                </div>
                             </div>
                         ))}
                     </div>

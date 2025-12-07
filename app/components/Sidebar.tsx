@@ -14,6 +14,9 @@ export default function Sidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
 
+    // Détecter la plateforme à partir de l'URL
+    const platform = pathname?.includes('/lichess/') ? 'lichess' : 'chesscom';
+
     useEffect(() => {
         const checkIfMobile = () => {
             setIsMobile(window.innerWidth < 768);
@@ -67,29 +70,29 @@ export default function Sidebar() {
                 </div>
 
                 <nav className="mt-10 space-y-6 flex-grow">
-                    <Link href={`/chesscom/user/${username}`}
-                          className={`${pathname === `/chesscom/user/${username}` ? 'text-chart4' : ''} flex items-center space-x-3 p-2 hover:text-chart4 rounded`}
+                    <Link href={`/${platform}/user/${username}`}
+                          className={`${pathname === `/${platform}/user/${username}` ? 'text-chart4' : ''} flex items-center space-x-3 p-2 hover:text-chart4 rounded`}
                           onClick={closeSidebar}>
                         <User/>
                         <span>User</span>
                     </Link>
 
-                    <Link href={`/chesscom/user/${username}/compare`}
-                          className={`${pathname === `/chesscom/user/${username}/compare` ? 'text-red-500' : ''} flex items-center space-x-3 p-2 hover:text-red-500 rounded`}
+                    <Link href={`/${platform}/user/${username}/compare`}
+                          className={`${pathname === `/${platform}/user/${username}/compare` ? 'text-red-500' : ''} flex items-center space-x-3 p-2 hover:text-red-500 rounded`}
                           onClick={closeSidebar}>
                         <ArcheryMatch/>
                         <span>Compare</span>
                     </Link>
 
                     <Link href={`/workinginprogress`}
-                          className={`${pathname === `/chesscom/user/${username}/goals` ? 'text-yellow-400' : ''} flex items-center space-x-3 p-2 hover:text-yellow-400 rounded`}
+                          className={`${pathname === `/${platform}/user/${username}/goals` ? 'text-yellow-400' : ''} flex items-center space-x-3 p-2 hover:text-yellow-400 rounded`}
                           onClick={closeSidebar}>
                         <TriangleFlag/>
                         <span>Goals</span>
                     </Link>
 
                     <Link href={`/workinginprogress`}
-                          className={`${pathname === `/chesscom/user/${username}/stats` ? 'text-orange-500' : ''} flex items-center space-x-3 p-2 hover:text-orange-500 rounded`}
+                          className={`${pathname === `/${platform}/user/${username}/stats` ? 'text-orange-500' : ''} flex items-center space-x-3 p-2 hover:text-orange-500 rounded`}
                           onClick={closeSidebar}>
                         <Reports/>
                         <span>Stats</span>

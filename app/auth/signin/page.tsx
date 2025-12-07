@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, LogIn } from 'iconoir-react';
@@ -30,8 +30,13 @@ export default function SignIn() {
             if (result?.error) {
                 setError(result.error);
             } else {
-                router.push('/dashboard');
-                router.refresh();
+                const session = await getSession();
+                if (session?.user?.chesscom_username) {
+                    router.push(`/chesscom/user/${session.user.chesscom_username}`);
+                    router.refresh();
+                } else {
+                    setError('Impossible de récupérer le nom d\'utilisateur Chess.com');
+                }
             }
         } catch (error) {
             setError('Une erreur s\'est produite lors de la connexion');

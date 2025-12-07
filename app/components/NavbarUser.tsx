@@ -1,7 +1,8 @@
 'use client'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu } from 'iconoir-react'
+import Image from 'next/image'
 
 interface UserData {
     avatar?: string;
@@ -18,12 +19,28 @@ export const toggleSidebar = () => {
 
 export default function Navbar() {
     const params = useParams();
+    const pathname = usePathname();
     const username = params?.username as string;
 
     const [userData, setUserData] = useState<UserData | null>(null)
     const [countryCode, setCountryCode] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isMobile, setIsMobile] = useState(false)
+
+    // Détecter la plateforme à partir de l'URL
+    const platform = pathname?.includes('/lichess/') ? 'lichess' : 'chesscom'
+    const platformConfig = {
+        chesscom: {
+            name: 'Chess.com',
+            logo: '/img/chesscom_logo.png',
+            color: 'from-green-500/20 to-green-600/20 border-green-500/30'
+        },
+        lichess: {
+            name: 'Lichess',
+            logo: '/img/lichess_logo.png',
+            color: 'from-slate-500/20 to-slate-600/20 border-slate-500/30'
+        }
+    }
 
     useEffect(() => {
         // Fonction pour détecter si l'écran est de taille mobile
@@ -44,20 +61,42 @@ export default function Navbar() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userResponse = await fetch(`https://api.chess.com/pub/player/${username}`)
-                if (!userResponse.ok) {
-                    throw new Error('Failed to fetch user data')
-                }
-                const userData = await userResponse.json()
-                setUserData(userData)
-
-                if (userData.country) {
-                    const countryResponse = await fetch(userData.country)
-                    if (!countryResponse.ok) {
-                        throw new Error('Failed to fetch country data')
+                if (platform === 'chesscom') {
+                    // Fetch Chess.com data
+                    const userResponse = await fetch(`https://api.chess.com/pub/player/${username}`)
+                    if (!userResponse.ok) {
+                        throw new Error('Failed to fetch user data')
                     }
-                    const countryData = await countryResponse.json()
-                    setCountryCode(countryData.code)
+                    const userData = await userResponse.json()
+                    setUserData(userData)
+
+                    if (userData.country) {
+                        const countryResponse = await fetch(userData.country)
+                        if (!countryResponse.ok) {
+                            throw new Error('Failed to fetch country data')
+                        }
+                        const countryData = await countryResponse.json()
+                        setCountryCode(countryData.code)
+                    }
+                } else {
+                    // Fetch Lichess data
+                    const userResponse = await fetch(`https://lichess.org/api/user/${username}`)
+                    if (!userResponse.ok) {
+                        throw new Error('Failed to fetch user data')
+                    }
+                    const userData = await userResponse.json()
+
+                    // Adapter les données Lichess au format attendu
+                    setUserData({
+                        avatar: userData.profile?.avatar,
+                        status: userData.profile?.bio,
+                        league: userData.perfs?.blitz?.rating?.toString(),
+                        country: userData.profile?.country
+                    })
+
+                    if (userData.profile?.country) {
+                        setCountryCode(userData.profile.country)
+                    }
                 }
 
             } catch (err) {
@@ -72,7 +111,7 @@ export default function Navbar() {
         if (username) {
             fetchData()
         }
-    }, [username])
+    }, [username, platform])
 
     if (error) {
         return <div>Error: {error}</div>
@@ -106,14 +145,31 @@ export default function Navbar() {
                         />
                     )}
                 </div>
-                <h1 className="text-2xl font-bold text-primary">{username}</h1>
-                {countryCode && (
-                    <img
-                        src={`https://flagsapi.com/${countryCode}/flat/64.png`}
-                        alt={`${countryCode} flag`}
-                        className="w-8 h-8"
-                    />
-                )}
+                <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-bold text-primary">{username}</h1>
+                        {countryCode && (
+                            <img
+                                src={`https://flagsapi.com/${countryCode}/flat/64.png`}
+                                alt={`${countryCode} flag`}
+                                className="w-8 h-8"
+                            />
+                        )}
+                    </div>
+                    {/* Badge de plateforme */}
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-sm border bg-gradient-to-r ${platformConfig[platform].color} transition-all duration-300`}>
+                        <Image
+                            src={platformConfig[platform].logo}
+                            alt={platformConfig[platform].name}
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                        />
+                        <span className="text-xs font-medium text-foreground/90">
+                            {platformConfig[platform].name}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     );

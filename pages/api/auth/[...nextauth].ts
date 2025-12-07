@@ -44,6 +44,7 @@ export const authOptions: NextAuthOptions = {
                     id: user.id,
                     email: user.email,
                     image: user.image || undefined,
+                    chesscom_username: user.chesscom_username,
                 };
             },
         }),
@@ -62,12 +63,14 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
+                token.chesscom_username = user.chesscom_username;
             }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string;
+                session.user.chesscom_username = token.chesscom_username as string;
             }
             return session;
         },
