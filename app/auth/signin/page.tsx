@@ -41,10 +41,10 @@ export default function SignIn() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-background">
+        <div className="h-screen flex flex-col bg-background">
             <Navbar />
 
-            <div className="flex-grow flex items-center justify-center px-4 py-12">
+            <div className="flex-grow flex items-center justify-center px-4 py-4">
                 <div className="w-full max-w-md">
                     <div className="text-center mb-8 animate-in fade-in slide-in-from-top duration-700">
                         <p className="text-foreground/60 text-xl">

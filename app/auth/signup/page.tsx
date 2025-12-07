@@ -87,19 +87,19 @@ export default function SignUpPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-background">
+        <div className="h-screen flex flex-col bg-background">
             <Navbar />
 
-            <div className="flex-grow flex items-center justify-center px-4 py-12">
-                <div className="w-full max-w-lg">
-                    <div className="text-center mb-8 animate-in fade-in slide-in-from-top duration-700">
-                        <p className="text-foreground/60 text-xl">
+            <div className="flex-grow flex items-center justify-center px-4 py-2 overflow-y-auto">
+                <div className="w-full max-w-lg my-2">
+                    <div className="text-center mb-4 animate-in fade-in slide-in-from-top duration-700">
+                        <p className="text-foreground/60 text-lg">
                             Créez votre compte pour commencer
                         </p>
                     </div>
 
                     {/* Main Form Card */}
-                    <div className="bg-card/50 backdrop-blur-sm border border-primary/10 rounded-2xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom duration-700">
+                    <div className="bg-card/50 backdrop-blur-sm border border-primary/10 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-bottom duration-700">
                         {error && (
                             <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top duration-300">
                                 <div className="w-1 h-12 bg-destructive rounded-full" />
@@ -107,9 +107,9 @@ export default function SignUpPage() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={handleSubmit} className="space-y-3">
                             {/* Email Field */}
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 <label htmlFor="email" className="block text-sm font-medium text-foreground/80">
                                     Email
                                 </label>
@@ -127,7 +127,7 @@ export default function SignUpPage() {
                                         onChange={handleChange}
                                         onFocus={() => setFocusedField('email')}
                                         onBlur={() => setFocusedField(null)}
-                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                        className="w-full pl-11 pr-4 py-2 bg-background border-2 border-input rounded-lg
                                                  text-foreground placeholder:text-foreground/30
                                                  focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
                                                  transition-all duration-300"
@@ -138,7 +138,7 @@ export default function SignUpPage() {
                             </div>
 
                             {/* Chess.com Username */}
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 <label htmlFor="chesscom_username" className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                                     <Image
                                         src="/img/chesscom_logo.png"
@@ -163,7 +163,7 @@ export default function SignUpPage() {
                                         onChange={handleChange}
                                         onFocus={() => setFocusedField('chesscom')}
                                         onBlur={() => setFocusedField(null)}
-                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                        className="w-full pl-11 pr-4 py-2 bg-background border-2 border-input rounded-lg
                                                  text-foreground placeholder:text-foreground/30
                                                  focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
                                                  transition-all duration-300"
@@ -173,7 +173,7 @@ export default function SignUpPage() {
                             </div>
 
                             {/* Lichess Username */}
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 <label htmlFor="lichess_username" className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                                     <Image
                                         src="/img/lichess_logo.png"
@@ -198,7 +198,7 @@ export default function SignUpPage() {
                                         onChange={handleChange}
                                         onFocus={() => setFocusedField('lichess')}
                                         onBlur={() => setFocusedField(null)}
-                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                        className="w-full pl-11 pr-4 py-2 bg-background border-2 border-input rounded-lg
                                                  text-foreground placeholder:text-foreground/30
                                                  focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
                                                  transition-all duration-300"
@@ -208,7 +208,7 @@ export default function SignUpPage() {
                             </div>
 
                             {/* Password Field */}
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 <label htmlFor="password" className="block text-sm font-medium text-foreground/80">
                                     Mot de passe
                                 </label>
@@ -226,7 +226,7 @@ export default function SignUpPage() {
                                         onChange={handleChange}
                                         onFocus={() => setFocusedField('password')}
                                         onBlur={() => setFocusedField(null)}
-                                        className="w-full pl-11 pr-4 py-3 bg-background border-2 border-input rounded-lg
+                                        className="w-full pl-11 pr-4 py-2 bg-background border-2 border-input rounded-lg
                                                  text-foreground placeholder:text-foreground/30
                                                  focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
                                                  transition-all duration-300"
@@ -238,7 +238,7 @@ export default function SignUpPage() {
                             </div>
 
                             {/* Terms Checkbox */}
-                            <div className="flex items-start gap-3 p-4 rounded-lg bg-background/50 border border-input/50">
+                            <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-input/50">
                                 <div className="relative flex items-center">
                                     <input
                                         id="terms"
@@ -273,7 +273,7 @@ export default function SignUpPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-primary text-background font-semibold py-3 px-4 rounded-lg
+                                className="w-full bg-primary text-background font-semibold py-2.5 px-4 rounded-lg
                                          hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20
                                          focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background
                                          disabled:opacity-50 disabled:cursor-not-allowed
@@ -295,7 +295,7 @@ export default function SignUpPage() {
                         </form>
 
                         {/* Divider */}
-                        <div className="relative my-8">
+                        <div className="relative my-4">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-input"></div>
                             </div>
@@ -321,7 +321,7 @@ export default function SignUpPage() {
                     </div>
 
                     {/* Footer Link */}
-                    <div className="mt-8 text-center animate-in fade-in duration-1000 delay-300">
+                    <div className="mt-4 text-center animate-in fade-in duration-1000 delay-300">
                         <Link
                             href="/"
                             className="text-sm text-foreground/40 hover:text-primary transition-colors duration-300"
