@@ -91,7 +91,7 @@ export default function Sidebar() {
                         <span>Goals</span>
                     </Link>
 
-                    <Link href={`/workinginprogress`}
+                    <Link href={`/${platform}/user/${username}/stats`}
                           className={`${pathname === `/${platform}/user/${username}/stats` ? 'text-orange-500' : ''} flex items-center space-x-3 p-2 hover:text-orange-500 rounded`}
                           onClick={closeSidebar}>
                         <Reports/>
