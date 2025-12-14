@@ -8,18 +8,21 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  password          String?
-  emailVerified     DateTime?
-  chesscom_username String
-  lichess_username  String
-  image             String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  accounts          Account[]
-  sessions          Session[]
-  goals             Goal[]
+  id                     String                      @id @default(cuid())
+  email                  String                      @unique
+  password               String?
+  emailVerified          DateTime?
+  chesscom_username      String
+  lichess_username       String
+  image                  String?
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+  accounts               Account[]
+  sessions               Session[]
+  goals                  Goal[]
+  pushSubscriptions      PushSubscription[]
+  notificationSettings   UserNotificationSettings?
+  notificationLogs       NotificationLog[]
 }
 
 model Account {
@@ -72,4 +75,62 @@ model Goal {
 
   @@index([userId])
   @@index([status])
+}
+
+model PushSubscription {
+  id            String   @id @default(cuid())
+  userId        String
+  endpoint      String   @unique
+  keys          Json     // { p256dh, auth }
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UserNotificationSettings {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+
+  // Goals notifications
+  goalReminders             Boolean  @default(true)
+  goalBehindSchedule        Boolean  @default(true)
+  goalAheadSchedule         Boolean  @default(true)
+  goalAchieved              Boolean  @default(true)
+  goalMissed                Boolean  @default(true)
+  weeklyProgress            Boolean  @default(true)
+
+  // Stats notifications
+  winStreak                 Boolean  @default(true)
+  loseStreak                Boolean  @default(true)
+  bigRatingGain             Boolean  @default(true)
+  bigRatingLoss             Boolean  @default(true)
+  newPersonalRecord         Boolean  @default(true)
+  ratingMilestone           Boolean  @default(true)
+  backToTop                 Boolean  @default(true)
+  winrateImprovement        Boolean  @default(true)
+  inactivityReminder        Boolean  @default(true)
+
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model NotificationLog {
+  id              String   @id @default(cuid())
+  userId          String
+  type            String   // GOAL_REMINDER, WIN_STREAK, etc.
+  relatedId       String?  // Goal ID or game mode
+  metadata        Json?    // Additional data (rating, streak count, etc.)
+  sentAt          DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([sentAt])
 }

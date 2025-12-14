@@ -3,6 +3,9 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useCachedFetch } from '@/hooks/useCachedFetch';
+import { useGoalsOffline } from '@/hooks/useGoalsOffline';
+import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 import {
   LineChart,
   Line,
@@ -41,6 +44,7 @@ interface Goal {
   targetDate: string;
   status: string;
   createdAt: string;
+  syncStatus?: 'synced' | 'pending' | 'failed';
 }
 
 interface PlayerStats {
@@ -65,10 +69,16 @@ export default function GoalsPage() {
   const username = params?.username as string;
   const { data: session } = useSession();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null);
+  // Use offline-capable hooks
+  const { goals, loading: goalsLoading, error: goalsError, createGoal, updateGoal, deleteGoal } = useGoalsOffline();
+  const { data: playerStats, loading: statsLoading, error: statsError } = useCachedFetch<PlayerStats>(
+    username ? `https://api.chess.com/pub/player/${username}/stats` : null,
+    username,
+    { platform: 'chesscom', cacheMaxAge: 1000 * 60 * 60 * 24 } // 24 hours
+  );
+
+  const loading = goalsLoading || statsLoading;
+  const error = goalsError?.message || statsError?.message || null;
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Form state
@@ -82,44 +92,14 @@ export default function GoalsPage() {
   const isOwnGoals =
     session?.user?.chesscom_username?.toLowerCase() === username?.toLowerCase();
 
+  // Set default ratings when stats load
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch player stats to get current ratings
-        const statsResponse = await fetch(
-          `https://api.chess.com/pub/player/${username}/stats`
-        );
-        if (!statsResponse.ok) throw new Error('Failed to fetch stats');
-        const stats = await statsResponse.json();
-        setPlayerStats(stats);
-
-        // Set default start rating based on blitz rating
-        const blitzRating = stats.chess_blitz?.last?.rating || 1000;
-        setStartRating(blitzRating);
-        setTargetRating(blitzRating + 100);
-
-        // Fetch user goals if authenticated
-        if (isOwnGoals) {
-          const goalsResponse = await fetch('/api/goals');
-          if (goalsResponse.ok) {
-            const goalsData = await goalsResponse.json();
-            setGoals(goalsData);
-          }
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (username) {
-      fetchData();
+    if (playerStats) {
+      const blitzRating = playerStats.chess_blitz?.last?.rating || 1000;
+      setStartRating(blitzRating);
+      setTargetRating(blitzRating + 100);
     }
-  }, [username, isOwnGoals]);
+  }, [playerStats]);
 
   // Update start rating when game mode changes
   useEffect(() => {
@@ -139,26 +119,15 @@ export default function GoalsPage() {
 
     try {
       setCreating(true);
-      const response = await fetch('/api/goals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          gameMode: selectedGameMode,
-          startRating,
-          targetRating,
-          targetDate: targetDate.toISOString(),
-        }),
+
+      // Use offline-capable hook
+      await createGoal({
+        gameMode: selectedGameMode,
+        startRating,
+        targetRating,
+        targetDate: targetDate.toISOString(),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create goal');
-      }
-
-      const newGoal = await response.json();
-      setGoals([newGoal, ...goals]);
       setShowCreateModal(false);
 
       // Reset form
@@ -180,15 +149,7 @@ export default function GoalsPage() {
     }
 
     try {
-      const response = await fetch(`/api/goals/${goalId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete goal');
-      }
-
-      setGoals(goals.filter((g) => g.id !== goalId));
+      await deleteGoal(goalId);
     } catch (err) {
       alert('Erreur lors de la suppression du goal');
     }
@@ -196,20 +157,7 @@ export default function GoalsPage() {
 
   const handleUpdateGoalStatus = async (goalId: string, newStatus: string) => {
     try {
-      const response = await fetch(`/api/goals/${goalId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update goal');
-      }
-
-      const updatedGoal = await response.json();
-      setGoals(goals.map((g) => (g.id === goalId ? updatedGoal : g)));
+      await updateGoal(goalId, { status: newStatus });
     } catch (err) {
       alert('Erreur lors de la mise à jour du goal');
     }
@@ -369,6 +317,9 @@ export default function GoalsPage() {
                     {/* Goal Header */}
                     <div className="flex items-start justify-between mb-6">
                       <div className="flex items-center gap-4">
+                        {goal.syncStatus && goal.syncStatus !== 'synced' && (
+                          <SyncStatusBadge status={goal.syncStatus} />
+                        )}
                         <div
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: gameMode?.color }}

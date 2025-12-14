@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useCachedFetch } from '@/hooks/useCachedFetch';
 import {
   LineChart,
   Line,
@@ -143,13 +144,24 @@ export default function StatsPage() {
   const username = params?.username as string;
   const { data: session } = useSession();
 
+  // Use cached fetch for player stats
+  const {
+    data: playerStats,
+    loading: statsLoading,
+    error: statsError,
+    fromCache
+  } = useCachedFetch<any>(
+    username ? `https://api.chess.com/pub/player/${username}/stats` : null,
+    username,
+    { platform: 'chesscom', cacheMaxAge: 1000 * 60 * 60 * 24 } // 24 hours
+  );
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ratingHistory, setRatingHistory] = useState<RatingPoint[]>([]);
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('3m');
   const [gameModeFilter, setGameModeFilter] = useState<GameMode>('blitz');
-  const [playerStats, setPlayerStats] = useState<any>(null);
   const [showMilestonesModal, setShowMilestonesModal] = useState(false);
 
   // Check if viewing own stats
@@ -159,32 +171,30 @@ export default function StatsPage() {
     ? 'Analyse complète de ta progression'
     : `Analyse complète de la progression de ${username}`;
 
+  // Set default game mode when stats load
+  useEffect(() => {
+    if (playerStats) {
+      const modes = [
+        { mode: 'bullet' as GameMode, rating: playerStats.chess_bullet?.last?.rating || 0 },
+        { mode: 'blitz' as GameMode, rating: playerStats.chess_blitz?.last?.rating || 0 },
+        { mode: 'rapid' as GameMode, rating: playerStats.chess_rapid?.last?.rating || 0 },
+        { mode: 'daily' as GameMode, rating: playerStats.chess_daily?.last?.rating || 0 },
+      ];
+      const bestMode = modes.reduce((best, current) =>
+        current.rating > best.rating ? current : best
+      );
+      setGameModeFilter(bestMode.mode);
+    }
+  }, [playerStats]);
+
   // Fetch rating history from game archives
   useEffect(() => {
     const fetchRatingHistory = async () => {
+      if (!username || !playerStats) return;
+
       try {
         setLoading(true);
         setError(null);
-
-        // Fetch player stats
-        const statsResponse = await fetch(
-          `https://api.chess.com/pub/player/${username}/stats`
-        );
-        if (!statsResponse.ok) throw new Error('Failed to fetch stats');
-        const stats = await statsResponse.json();
-        setPlayerStats(stats);
-
-        // Determine best game mode and set as default
-        const modes = [
-          { mode: 'bullet' as GameMode, rating: stats.chess_bullet?.last?.rating || 0 },
-          { mode: 'blitz' as GameMode, rating: stats.chess_blitz?.last?.rating || 0 },
-          { mode: 'rapid' as GameMode, rating: stats.chess_rapid?.last?.rating || 0 },
-          { mode: 'daily' as GameMode, rating: stats.chess_daily?.last?.rating || 0 },
-        ];
-        const bestMode = modes.reduce((best, current) =>
-          current.rating > best.rating ? current : best
-        );
-        setGameModeFilter(bestMode.mode);
 
         // Fetch game archives
         const archivesResponse = await fetch(
@@ -233,10 +243,8 @@ export default function StatsPage() {
       }
     };
 
-    if (username) {
-      fetchRatingHistory();
-    }
-  }, [username]);
+    fetchRatingHistory();
+  }, [username, playerStats]);
 
   // Filter data based on time and game mode
   const filteredData = useMemo(() => {
