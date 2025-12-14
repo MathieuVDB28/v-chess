@@ -477,19 +477,19 @@ export default function GoalsPage() {
                     </div>
 
                     {/* Chart */}
-                    <div className="w-full h-[300px]">
+                    <div className="w-full h-[400px] md:h-[350px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={projection.data}>
+                        <LineChart data={projection.data} margin={{ top: 5, right: 5, left: 0, bottom: 20 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                           <XAxis
                             dataKey="date"
                             stroke="#ffffff60"
-                            tick={{ fill: '#ffffff60' }}
+                            tick={{ fill: '#ffffff60', fontSize: 12 }}
                             tickLine={{ stroke: '#ffffff20' }}
                           />
                           <YAxis
                             stroke="#ffffff60"
-                            tick={{ fill: '#ffffff60' }}
+                            tick={{ fill: '#ffffff60', fontSize: 12 }}
                             tickLine={{ stroke: '#ffffff20' }}
                             domain={[goal.startRating - 50, goal.targetRating + 50]}
                           />
@@ -501,12 +501,16 @@ export default function GoalsPage() {
                             }}
                             labelStyle={{ color: '#ffffff' }}
                           />
-                          <Legend />
+                          <Legend
+                            verticalAlign="bottom"
+                            wrapperStyle={{ paddingTop: '20px', fontSize: '14px' }}
+                            iconType="line"
+                          />
                           <ReferenceLine
                             y={goal.targetRating}
                             stroke="#fbbf24"
                             strokeDasharray="3 3"
-                            label={{ value: 'Objectif', fill: '#fbbf24' }}
+                            label={{ value: 'Objectif', fill: '#fbbf24', fontSize: 12 }}
                           />
                           <Line
                             type="monotone"
