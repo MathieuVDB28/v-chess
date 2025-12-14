@@ -84,7 +84,7 @@ export default function Sidebar() {
                         <span>Compare</span>
                     </Link>
 
-                    <Link href={`/workinginprogress`}
+                    <Link href={`/${platform}/user/${username}/goals`}
                           className={`${pathname === `/${platform}/user/${username}/goals` ? 'text-yellow-400' : ''} flex items-center space-x-3 p-2 hover:text-yellow-400 rounded`}
                           onClick={closeSidebar}>
                         <TriangleFlag/>
