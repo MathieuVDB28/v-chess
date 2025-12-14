@@ -3,8 +3,15 @@ import prisma from '@/lib/prisma';
 import { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT } from './vapid';
 import { NotificationData, NotificationType } from './notificationTypes';
 
-// Configure web-push
-webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+// Lazy initialization to avoid build-time errors
+let vapidConfigured = false;
+
+function ensureVapidConfigured() {
+  if (!vapidConfigured && VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY && VAPID_SUBJECT) {
+    webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+    vapidConfigured = true;
+  }
+}
 
 export async function sendPushNotification(
   userId: string,
@@ -14,6 +21,9 @@ export async function sendPushNotification(
   metadata?: Record<string, any>
 ): Promise<{ success: number; failed: number }> {
   try {
+    // Ensure VAPID is configured
+    ensureVapidConfigured();
+
     // Get all push subscriptions for this user
     const subscriptions = await prisma.pushSubscription.findMany({
       where: { userId },
