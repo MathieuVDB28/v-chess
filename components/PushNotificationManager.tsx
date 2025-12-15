@@ -126,26 +126,44 @@ export function PushNotificationManager() {
   }
 
   async function subscribe() {
-    if (!session?.data || !('serviceWorker' in navigator)) return;
+    if (!session?.data || !('serviceWorker' in navigator)) {
+      console.error('Cannot subscribe: no session or service worker not supported');
+      return;
+    }
 
     setLoading(true);
 
     try {
+      console.log('Starting subscription process...');
+
+      // Check for VAPID public key
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidPublicKey) {
+        console.error('VAPID public key not configured!');
+        alert('Erreur de configuration: VAPID public key manquante. Contactez le support.');
+        return;
+      }
+      console.log('VAPID public key found');
+
       const registration = await navigator.serviceWorker.ready;
+      console.log('Service worker ready:', registration);
 
       // Check if already subscribed
       let subscription = await registration.pushManager.getSubscription();
+      console.log('Existing subscription:', subscription);
 
       if (!subscription) {
+        console.log('Creating new push subscription...');
         // Subscribe to push notifications
-        const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
         });
+        console.log('Push subscription created:', subscription.endpoint);
       }
 
       // Send subscription to server
+      console.log('Sending subscription to server...');
       const response = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -160,16 +178,26 @@ export function PushNotificationManager() {
         }),
       });
 
+      console.log('Server response:', response.status, response.statusText);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('Subscription saved:', data);
         setIsSubscribed(true);
         localStorage.setItem('push_subscription_enabled', 'true');
-        console.log('Subscribed to push notifications');
+        console.log('✅ Subscribed to push notifications');
       } else {
-        throw new Error('Failed to save subscription');
+        const errorData = await response.json();
+        console.error('Failed to save subscription:', errorData);
+        throw new Error(`Server error: ${errorData.error || response.statusText}`);
       }
     } catch (error) {
-      console.error('Error subscribing to push notifications:', error);
-      alert('Erreur lors de l\'inscription aux notifications');
+      console.error('❌ Error subscribing to push notifications:', error);
+      if (error instanceof Error) {
+        alert(`Erreur lors de l'inscription aux notifications: ${error.message}`);
+      } else {
+        alert('Erreur lors de l\'inscription aux notifications');
+      }
     } finally {
       setLoading(false);
     }
