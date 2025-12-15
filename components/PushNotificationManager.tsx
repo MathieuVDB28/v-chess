@@ -21,28 +21,60 @@ export function PushNotificationManager() {
 
   // Auto-resubscribe if subscription is lost
   useEffect(() => {
-    if (!session?.data || permission !== 'granted') return;
+    if (!session?.data || permission !== 'granted' || !('serviceWorker' in navigator)) return;
 
     const checkAndResubscribe = async () => {
-      if (!('serviceWorker' in navigator)) return;
-
       try {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
+        const wasSubscribed = localStorage.getItem('push_subscription_enabled') === 'true';
 
-        if (!subscription && localStorage.getItem('push_subscription_enabled') === 'true') {
+        if (!subscription && wasSubscribed) {
           // User was subscribed before but subscription was lost - resubscribe automatically
           console.log('Subscription lost, resubscribing automatically...');
-          await subscribe();
+
+          const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
+          const newSubscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+          });
+
+          // Send subscription to server
+          const response = await fetch('/api/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              subscription: {
+                endpoint: newSubscription.endpoint,
+                keys: {
+                  p256dh: arrayBufferToBase64(newSubscription.getKey('p256dh')!),
+                  auth: arrayBufferToBase64(newSubscription.getKey('auth')!),
+                },
+              },
+            }),
+          });
+
+          if (response.ok) {
+            setIsSubscribed(true);
+            console.log('Auto-resubscribed successfully');
+          }
         } else if (subscription) {
-          // Ensure our state is correct
+          // Sync state with actual subscription
           setIsSubscribed(true);
-          localStorage.setItem('push_subscription_enabled', 'true');
+          if (!wasSubscribed) {
+            localStorage.setItem('push_subscription_enabled', 'true');
+          }
+        } else if (!subscription && !wasSubscribed) {
+          // No subscription and user never subscribed - ensure state is correct
+          setIsSubscribed(false);
         }
       } catch (error) {
         console.error('Error checking subscription:', error);
       }
     };
+
+    // Initial check
+    checkAndResubscribe();
 
     // Check on page visibility change (when user returns to tab)
     const handleVisibilityChange = () => {
@@ -51,17 +83,9 @@ export function PushNotificationManager() {
       }
     };
 
-    // Initial check
-    checkAndResubscribe();
-
-    // Check every 30 seconds
-    const interval = setInterval(checkAndResubscribe, 30000);
-
-    // Check when page becomes visible
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [session, permission]);
