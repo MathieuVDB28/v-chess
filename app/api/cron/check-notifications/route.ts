@@ -39,10 +39,12 @@ export async function GET(req: NextRequest) {
     // Run checks for each user
     for (const user of usersWithGoals) {
       try {
-        // Skip if user has no notification settings (means they haven't enabled notifications)
+        // Create default notification settings if they don't exist
         if (!user.notificationSettings) {
-          console.log(`Skipping user ${user.chesscom_username} - no notification settings`);
-          continue;
+          console.log(`Creating default notification settings for user ${user.chesscom_username}`);
+          await prisma.userNotificationSettings.create({
+            data: { userId: user.id },
+          });
         }
 
         await runAllNotificationChecks(user.id, user.chesscom_username);
