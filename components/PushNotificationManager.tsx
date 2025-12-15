@@ -19,6 +19,53 @@ export function PushNotificationManager() {
     }
   }, [session]);
 
+  // Auto-resubscribe if subscription is lost
+  useEffect(() => {
+    if (!session?.data || permission !== 'granted') return;
+
+    const checkAndResubscribe = async () => {
+      if (!('serviceWorker' in navigator)) return;
+
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+
+        if (!subscription && localStorage.getItem('push_subscription_enabled') === 'true') {
+          // User was subscribed before but subscription was lost - resubscribe automatically
+          console.log('Subscription lost, resubscribing automatically...');
+          await subscribe();
+        } else if (subscription) {
+          // Ensure our state is correct
+          setIsSubscribed(true);
+          localStorage.setItem('push_subscription_enabled', 'true');
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+      }
+    };
+
+    // Check on page visibility change (when user returns to tab)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkAndResubscribe();
+      }
+    };
+
+    // Initial check
+    checkAndResubscribe();
+
+    // Check every 30 seconds
+    const interval = setInterval(checkAndResubscribe, 30000);
+
+    // Check when page becomes visible
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [session, permission]);
+
   async function checkSubscription() {
     if (!session?.data || !('serviceWorker' in navigator)) return;
 
@@ -91,6 +138,7 @@ export function PushNotificationManager() {
 
       if (response.ok) {
         setIsSubscribed(true);
+        localStorage.setItem('push_subscription_enabled', 'true');
         console.log('Subscribed to push notifications');
       } else {
         throw new Error('Failed to save subscription');
@@ -123,6 +171,7 @@ export function PushNotificationManager() {
         });
 
         setIsSubscribed(false);
+        localStorage.removeItem('push_subscription_enabled');
         console.log('Unsubscribed from push notifications');
       }
     } catch (error) {
