@@ -16,6 +16,16 @@ export function PushNotificationManager() {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       setPermission(Notification.permission);
       checkSubscription();
+
+      // Debug: Check service worker status
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          console.log('🔧 Service worker registrations:', registrations.length);
+          registrations.forEach((reg, i) => {
+            console.log(`🔧 SW ${i}:`, reg.active?.scriptURL, 'State:', reg.active?.state);
+          });
+        });
+      }
     }
   }, [session]);
 
@@ -145,7 +155,12 @@ export function PushNotificationManager() {
       }
       console.log('VAPID public key found');
 
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Service worker timeout')), 10000)
+        )
+      ]) as ServiceWorkerRegistration;
       console.log('Service worker ready:', registration);
 
       // Check if already subscribed
@@ -194,7 +209,11 @@ export function PushNotificationManager() {
     } catch (error) {
       console.error('❌ Error subscribing to push notifications:', error);
       if (error instanceof Error) {
-        alert(`Erreur lors de l'inscription aux notifications: ${error.message}`);
+        if (error.message === 'Service worker timeout') {
+          alert('Le service worker n\'est pas disponible. Veuillez recharger la page et réessayer. Si le problème persiste, vérifiez que votre navigateur supporte les service workers.');
+        } else {
+          alert(`Erreur lors de l'inscription aux notifications: ${error.message}`);
+        }
       } else {
         alert('Erreur lors de l\'inscription aux notifications');
       }
