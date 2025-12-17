@@ -12,7 +12,7 @@ export function ServiceWorkerRegistration() {
       const wb = window.workbox;
 
       // A common UX pattern for progressive web apps is to show a banner when a service worker has updated and waiting to install.
-      wb.addEventListener('waiting', (event) => {
+      wb.addEventListener('waiting', () => {
         console.log('Service worker is waiting, skipping waiting...');
         // Assuming the user accepted the update, set up a listener
         // that will reload the page as soon as the previously waiting
