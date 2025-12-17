@@ -9,6 +9,8 @@ export default withPWA({
   skipWaiting: true,
   disable: false, // Enable SW in development to test push notifications
   importScripts: ['/sw-push-handler.js'],
+  buildExcludes: [/app-build-manifest\.json$/],
+  publicExcludes: ['!robots.txt', '!sitemap.xml'],
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/api\.chess\.com\/.*/i,

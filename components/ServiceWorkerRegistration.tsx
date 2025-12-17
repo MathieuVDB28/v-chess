@@ -4,11 +4,16 @@ import { useEffect } from 'react';
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
+    console.log('🔧 ServiceWorkerRegistration: Starting...');
+    console.log('🔧 window.workbox exists:', typeof window !== 'undefined' && window.workbox !== undefined);
+    console.log('🔧 serviceWorker in navigator:', 'serviceWorker' in navigator);
+
     if (
       typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&
       window.workbox !== undefined
     ) {
+      console.log('🔧 Using workbox registration');
       const wb = window.workbox;
 
       // A common UX pattern for progressive web apps is to show a banner when a service worker has updated and waiting to install.
@@ -29,15 +34,24 @@ export function ServiceWorkerRegistration() {
       wb.register();
     } else {
       // Manual registration as fallback
+      console.log('🔧 Using manual registration (fallback)');
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-          .register('/sw.js', { scope: '/' })
-          .then((registration) => {
-            console.log('✅ Service Worker registered:', registration);
-          })
-          .catch((error) => {
-            console.error('❌ Service Worker registration failed:', error);
-          });
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js', { scope: '/' })
+            .then((registration) => {
+              console.log('✅ Service Worker registered successfully:', registration);
+              console.log('✅ SW scope:', registration.scope);
+              console.log('✅ SW active:', registration.active);
+            })
+            .catch((error) => {
+              console.error('❌ Service Worker registration failed:', error);
+              console.error('❌ Error name:', error.name);
+              console.error('❌ Error message:', error.message);
+            });
+        });
+      } else {
+        console.error('❌ Service workers are not supported in this browser');
       }
     }
   }, []);
