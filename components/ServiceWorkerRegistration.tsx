@@ -8,6 +8,11 @@ export function ServiceWorkerRegistration() {
     console.log('🔧 window.workbox exists:', typeof window !== 'undefined' && window.workbox !== undefined);
     console.log('🔧 serviceWorker in navigator:', 'serviceWorker' in navigator);
 
+    // iOS detection
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = (window.navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
+    console.log('🔧 Device:', { isIOS, isStandalone, userAgent: navigator.userAgent });
+
     if (
       typeof window !== 'undefined' &&
       'serviceWorker' in navigator &&

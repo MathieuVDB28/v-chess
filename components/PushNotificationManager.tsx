@@ -138,6 +138,16 @@ export function PushNotificationManager() {
   async function subscribe() {
     if (!session?.data || !('serviceWorker' in navigator)) {
       console.error('Cannot subscribe: no session or service worker not supported');
+
+      // Check if iOS
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = (window.navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+      if (isIOS && !isStandalone) {
+        alert('Sur iOS, les notifications ne fonctionnent que si vous installez l\'application sur votre écran d\'accueil.\n\n1. Appuyez sur le bouton Partager (icône carrée avec flèche)\n2. Sélectionnez "Sur l\'écran d\'accueil"\n3. Relancez l\'app depuis l\'icône sur votre écran d\'accueil');
+      } else if (isIOS) {
+        alert('Les notifications push ne sont pas encore entièrement supportées sur votre version d\'iOS. Veuillez vérifier que vous avez iOS 16.4 ou supérieur.');
+      }
       return;
     }
 
@@ -145,6 +155,11 @@ export function PushNotificationManager() {
 
     try {
       console.log('Starting subscription process...');
+
+      // iOS detection
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = (window.navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
+      console.log('Device info:', { isIOS, isStandalone });
 
       // Check for VAPID public key
       const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -208,9 +223,20 @@ export function PushNotificationManager() {
       }
     } catch (error) {
       console.error('❌ Error subscribing to push notifications:', error);
+
+      // iOS-specific error handling
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = (window.navigator as any).standalone || window.matchMedia('(display-mode: standalone)').matches;
+
       if (error instanceof Error) {
         if (error.message === 'Service worker timeout') {
-          alert('Le service worker n\'est pas disponible. Veuillez recharger la page et réessayer. Si le problème persiste, vérifiez que votre navigateur supporte les service workers.');
+          if (isIOS && !isStandalone) {
+            alert('Sur iOS, les notifications ne fonctionnent que si vous installez l\'application sur votre écran d\'accueil.\n\n1. Appuyez sur le bouton Partager dans Safari\n2. Sélectionnez "Sur l\'écran d\'accueil"\n3. Relancez l\'app depuis l\'icône');
+          } else if (isIOS && isStandalone) {
+            alert('Les notifications push ne sont pas disponibles.\n\nAssurez-vous d\'avoir:\n- iOS 16.4 ou supérieur\n- Autorisé les notifications dans Réglages → Safari → Notifications');
+          } else {
+            alert('Le service worker n\'est pas disponible. Veuillez recharger la page et réessayer.');
+          }
         } else {
           alert(`Erreur lors de l'inscription aux notifications: ${error.message}`);
         }
