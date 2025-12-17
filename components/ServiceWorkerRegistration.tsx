@@ -41,20 +41,50 @@ export function ServiceWorkerRegistration() {
       // Manual registration as fallback
       console.log('🔧 Using manual registration (fallback)');
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker
-            .register('/sw.js', { scope: '/' })
-            .then((registration) => {
-              console.log('✅ Service Worker registered successfully:', registration);
-              console.log('✅ SW scope:', registration.scope);
-              console.log('✅ SW active:', registration.active);
-            })
-            .catch((error) => {
-              console.error('❌ Service Worker registration failed:', error);
+        const registerSW = async () => {
+          try {
+            console.log('🔧 Starting SW registration...');
+            const registration = await navigator.serviceWorker.register('/sw.js', {
+              scope: '/',
+              updateViaCache: 'none' // Important for iOS
+            });
+            console.log('✅ Service Worker registered successfully');
+            console.log('✅ SW scope:', registration.scope);
+            console.log('✅ SW installing:', registration.installing);
+            console.log('✅ SW waiting:', registration.waiting);
+            console.log('✅ SW active:', registration.active);
+
+            // Wait for SW to be ready
+            if (registration.installing) {
+              console.log('🔧 Service Worker installing...');
+              registration.installing.addEventListener('statechange', (e: Event) => {
+                const sw = e.target as ServiceWorker;
+                console.log('🔧 SW state changed to:', sw.state);
+              });
+            }
+
+            // Force update check on iOS
+            if (isIOS) {
+              console.log('🔧 Checking for SW updates (iOS)...');
+              await registration.update();
+            }
+          } catch (error) {
+            console.error('❌ Service Worker registration failed:', error);
+            if (error instanceof Error) {
               console.error('❌ Error name:', error.name);
               console.error('❌ Error message:', error.message);
-            });
-        });
+              console.error('❌ Error stack:', error.stack);
+            }
+          }
+        };
+
+        // Register immediately, don't wait for load on iOS
+        if (isIOS) {
+          console.log('🔧 iOS detected, registering SW immediately');
+          registerSW();
+        } else {
+          window.addEventListener('load', registerSW);
+        }
       } else {
         console.error('❌ Service workers are not supported in this browser');
       }

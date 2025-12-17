@@ -170,13 +170,18 @@ export function PushNotificationManager() {
       }
       console.log('VAPID public key found');
 
+      // iOS needs more time to initialize service worker
+      const timeout = isIOS ? 30000 : 10000;
+      console.log(`Waiting for service worker (timeout: ${timeout}ms)...`);
+
       const registration = await Promise.race([
         navigator.serviceWorker.ready,
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Service worker timeout')), 10000)
+          setTimeout(() => reject(new Error('Service worker timeout')), timeout)
         )
       ]) as ServiceWorkerRegistration;
       console.log('Service worker ready:', registration);
+      console.log('Service worker state:', registration.active?.state);
 
       // Check if already subscribed
       let subscription = await registration.pushManager.getSubscription();
